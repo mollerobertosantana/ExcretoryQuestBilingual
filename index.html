@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExcretionQuest — Bubble's Clean-Up Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#e6f4ff;--blue:#3a8dde;--deep:#1f4e79;--pink:#ff7aa8;--ok:#2fb36d;--bad:#e5484d;--ink:#1d2b3a;--muted:#5d7189;--line:#cfe6fb}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Nunito,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(180deg,#d6edff 0%,#f3faff 55%,#eaf6ff 100%);min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;background:rgba(255,255,255,.75);backdrop-filter:blur(6px);position:sticky;top:0;z-index:20;border-bottom:2px solid var(--line)}
+.brand{font-weight:900;color:var(--deep);font-size:1.15rem;cursor:pointer;white-space:nowrap}
+.brand span{color:var(--pink)}
+.hud{display:flex;gap:8px;align-items:center}
+.pill{display:inline-block;background:#fff;border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:800;white-space:nowrap}
+.iconbtn{font:inherit;background:#fff;border:2px solid var(--line);border-radius:999px;padding:4px 10px;font-size:1rem;cursor:pointer}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:22px;box-shadow:0 6px 0 var(--line),0 12px 30px rgba(58,141,222,.12);padding:20px;margin-bottom:18px}
+h1,h2,h3{margin:.2em 0 .45em;line-height:1.2}
+h1{color:var(--deep);font-weight:900}
+h2{color:var(--deep);font-weight:900}
+p{line-height:1.55}
+.muted{color:var(--muted)}
+.btn{font:inherit;font-weight:800;border:none;border-radius:14px;padding:12px 18px;cursor:pointer;background:var(--blue);color:#fff;box-shadow:0 4px 0 #2766a8;transition:transform .08s;touch-action:manipulation}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #2766a8}
+.btn.pink{background:var(--pink);box-shadow:0 4px 0 #d24f80}
+.btn.green{background:var(--ok);box-shadow:0 4px 0 #1f8a51}
+.btn.ghost{background:#fff;color:var(--deep);box-shadow:0 4px 0 var(--line);border:2px solid var(--line)}
+.btn.small{padding:7px 12px;font-size:.9rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.center{text-align:center}
+.guide{display:flex;gap:12px;align-items:flex-end;margin:6px 0 14px}
+.guide .dog{flex:0 0 auto;animation:bob 2.6s ease-in-out infinite}
+.speech{position:relative;background:#fff;border:3px solid var(--line);border-radius:18px;padding:12px 16px;font-weight:700;flex:1;line-height:1.45}
+.speech:before{content:"";position:absolute;left:-17px;bottom:20px;border:8px solid transparent;border-right-color:var(--line)}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-2deg)}}
+input[type=text]{font:inherit;font-size:1.1rem;padding:12px 14px;border:3px solid var(--line);border-radius:14px;width:min(320px,100%);outline:none}
+input[type=text]:focus{border-color:var(--blue)}
+/* title */
+.hero{text-align:center;padding:26px 20px}
+.hero h1{font-size:clamp(2rem,6vw,3.2rem);margin:.1em 0}
+.hero .sub{font-size:1.15rem;color:var(--muted);font-weight:700}
+.organs-strip{font-size:2.4rem;letter-spacing:10px;margin:8px 0}
+/* map */
+.map{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:640px){.map{grid-template-columns:1fr}}
+.zone{cursor:pointer;border-radius:22px;padding:18px 18px 16px;color:#fff;position:relative;overflow:hidden;box-shadow:0 6px 0 rgba(0,0,0,.15);transition:transform .15s;border:none;text-align:left;font:inherit}
+.zone:hover{transform:translateY(-3px) rotate(-.4deg)}
+.zone .em{font-size:3rem;line-height:1}
+.zone h3{font-size:1.4rem;margin:.3em 0 .1em;color:#fff}
+.zone .ex{font-weight:700;opacity:.95}
+.zone .stars{position:absolute;top:14px;right:16px;font-size:1.3rem;background:rgba(255,255,255,.25);border-radius:999px;padding:2px 10px}
+.zone .badge{position:absolute;bottom:12px;right:14px;background:#fff;color:var(--deep);font-weight:900;border-radius:999px;padding:3px 10px;font-size:.85rem}
+.z-lungs{background:linear-gradient(135deg,#ff8fab,#ff5c8a)}
+.z-skin{background:linear-gradient(135deg,#f6b26b,#e8894a)}
+.z-kidneys{background:linear-gradient(135deg,#d9605a,#a63f3a)}
+.z-liver{background:linear-gradient(135deg,#8e5ac8,#5b3a96)}
+.boss{background:linear-gradient(135deg,#3a8dde,#1f4e79);color:#fff;border-radius:22px;padding:20px;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.15);display:flex;align-items:center;gap:16px;border:none;width:100%;text-align:left;font:inherit;margin-top:16px}
+.boss .em{font-size:3rem}
+.boss h3{color:#fff;font-size:1.4rem;margin:0}
+/* organ page */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px}
+.tab{font:inherit;font-weight:800;border:3px solid var(--line);background:#fff;color:var(--deep);border-radius:14px;padding:9px 14px;cursor:pointer}
+.tab.on{background:var(--deep);color:#fff;border-color:var(--deep)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:720px){.facts{grid-template-columns:1fr}}
+.fact{background:var(--sky);border-radius:16px;padding:12px 14px}
+.fact .fh{display:block;color:var(--deep);margin-bottom:4px;font-weight:900}
+.fact ol,.fact ul{margin:4px 0 0;padding-left:20px}
+.fact li{margin:2px 0}
+.learn{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:start}
+@media(max-width:760px){.learn{grid-template-columns:1fr}}
+.dia-wrap{background:linear-gradient(180deg,#f7fbff,#eef7ff);border:3px solid var(--line);border-radius:18px;padding:8px}
+.dia-wrap svg{width:100%;height:auto;display:block}
+.part{cursor:pointer;transition:filter .2s}
+.part:hover{filter:brightness(1.12)}
+.part.active{filter:drop-shadow(0 0 3px #ff2d7a) drop-shadow(0 0 7px #ff2d7a);animation:glow 1.2s ease-in-out infinite}
+.part.right{filter:drop-shadow(0 0 4px #2fb36d) drop-shadow(0 0 9px #2fb36d)}
+.part.wrong{filter:drop-shadow(0 0 4px #e5484d) drop-shadow(0 0 9px #e5484d)}
+@keyframes glow{50%{filter:drop-shadow(0 0 1px #ff2d7a) drop-shadow(0 0 4px #ff2d7a)}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{font:inherit;font-weight:800;border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;color:var(--deep)}
+.chip.seen{background:#e7f8ee;border-color:#9fdcb9}
+.chip.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.info{background:#fffaf0;border:3px dashed #ffd59a;border-radius:16px;padding:14px;min-height:120px}
+.info h3{color:#b5651d}
+.viewsw{display:flex;gap:8px;margin-bottom:8px}
+.progress{height:12px;background:#e3f0fb;border-radius:999px;overflow:hidden;margin:8px 0}
+.progress > div{height:100%;background:linear-gradient(90deg,#57c785,#2fb36d);width:0;transition:width .3s}
+/* quiz */
+.qtext{font-size:1.25rem}
+.opts{display:grid;gap:10px;margin:12px 0}
+.opt{font:inherit;font-weight:700;text-align:left;border:3px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;cursor:pointer;font-size:1.02rem}
+.opt:hover:not(:disabled){border-color:var(--blue);background:#f3f9ff}
+.opt.right{background:#e7f8ee;border-color:var(--ok)}
+.opt.wrong{background:#fdecec;border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.fb{border-radius:16px;padding:12px 14px;margin:10px 0;font-weight:600;line-height:1.5}
+.fb.ok{background:#e7f8ee;border:2px solid #9fdcb9}
+.fb.no{background:#fdecec;border:2px solid #f3b1b3}
+.tbar{height:12px;background:#e3f0fb;border-radius:999px;overflow:hidden;margin:6px 0 10px}
+.tbar > div{height:100%;width:100%;background:linear-gradient(90deg,#ffb547,#ff5c5c)}
+.qhead{display:flex;gap:8px;flex-wrap:wrap}
+/* lungs game */
+.arena{position:relative;height:380px;border-radius:22px;overflow:hidden;border:3px solid #f3b6c6;background:radial-gradient(circle at 50% 120%,#ffd6e0 0%,#ffe9ef 50%,#fff5f8 100%);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.arena .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:800;color:#c0466b;text-align:center;padding:20px}
+.cap{position:absolute;left:0;right:0;bottom:0;height:26px;background:repeating-linear-gradient(90deg,#e63946 0 40px,#3a6fd8 40px 80px);opacity:.35}
+.mol{position:absolute;bottom:-70px;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:1.05rem;cursor:pointer;animation:rise linear forwards;box-shadow:inset -6px -6px 0 rgba(0,0,0,.12),0 3px 6px rgba(0,0,0,.15);touch-action:manipulation}
+.mol.co2{background:#7b8794}
+.mol.h2o{background:#4aa3df}
+.mol.o2{background:#ef5b5b}
+.mol.pop{animation:pop .3s forwards!important}
+@keyframes rise{to{transform:translateY(-470px)}}
+@keyframes pop{to{transform:scale(1.8);opacity:0}}
+.floaty{position:absolute;font-weight:900;pointer-events:none;animation:floatup .8s forwards;font-size:1.2rem}
+@keyframes floatup{to{transform:translateY(-40px);opacity:0}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 10px;font-weight:700}
+.legend i{display:inline-block;width:18px;height:18px;border-radius:50%;vertical-align:-3px;margin-right:4px}
+/* kidney sort */
+.sortcard{text-align:center;background:var(--sky);border-radius:20px;padding:18px;margin:6px 0 12px;animation:popin .3s}
+.sortcard .big{font-size:3.4rem}
+@keyframes popin{from{transform:scale(.8);opacity:0}}
+.bins{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:600px){.bins{grid-template-columns:1fr}}
+.bin{font:inherit;font-weight:800;border:3px solid var(--line);background:#fff;border-radius:16px;padding:14px 10px;cursor:pointer;font-size:1rem}
+.bin:hover:not(:disabled){border-color:var(--blue)}
+.bin.right{background:#e7f8ee;border-color:var(--ok)}
+.bin.wrong{background:#fdecec;border-color:var(--bad)}
+.seqbuilt{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;background:var(--sky);border-radius:16px;padding:10px;margin:10px 0;align-items:center}
+.seqbuilt .step{background:var(--ok);color:#fff;font-weight:800;border-radius:12px;padding:8px 12px}
+.seqbuilt .arrow{font-weight:900;color:var(--deep)}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+/* memory */
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:640px;margin:0 auto}
+@media(max-width:600px){.mem{grid-template-columns:repeat(3,1fr)}}
+.mcard{font:inherit;aspect-ratio:1/1;border-radius:16px;border:none;cursor:pointer;font-weight:800;font-size:.86rem;padding:8px;line-height:1.25;color:#fff;background:linear-gradient(135deg,#8e5ac8,#5b3a96);box-shadow:0 4px 0 #3e2770;display:flex;align-items:center;justify-content:center;text-align:center;transition:transform .2s}
+.mcard .back{font-size:2rem}
+.mcard.up.term{background:#fff;color:var(--deep);border:3px solid #8e5ac8;box-shadow:0 4px 0 #c9b3ea}
+.mcard.up.meaning{background:#fff8e6;color:#7a4b00;border:3px solid #f0b33c;box-shadow:0 4px 0 #f3d79a}
+.mcard.done{background:#e7f8ee!important;border:3px solid var(--ok)!important;color:#1b6b40!important;box-shadow:0 4px 0 #9fdcb9!important;cursor:default}
+/* hotspot */
+.prompt{font-size:1.2rem;font-weight:900;background:#fff3d6;border:3px solid #ffd27a;border-radius:16px;padding:12px 14px;margin:6px 0 10px;color:#7a4b00}
+/* cert */
+.cert{border:10px double #3a8dde;border-radius:20px;padding:28px;text-align:center;background:linear-gradient(180deg,#fff,#f3faff)}
+.cert h1{font-size:2rem}
+.cert .nm{font-size:2rem;font-weight:900;color:var(--pink);border-bottom:3px dotted var(--line);display:inline-block;padding:0 20px 4px;margin:6px 0}
+.confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:50;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.result-big{font-size:3rem;text-align:center;margin:6px 0}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:10px 0 24px}
+@media print{header,footer,.noprint{display:none!important}body{background:#fff}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" id="brand">🐾 Excretion<span>Quest</span></div>
+  <div class="hud">
+    <button class="iconbtn" id="lang" title="Language / Bahasa">🇮🇩 ID</button>
+    <span class="pill" id="xp">⭐ 0 XP</span>
+    <button class="iconbtn" id="snd" title="Sound on/off">🔊</button>
+  </div>
+</header>
+<main id="app"></main>
+<footer id="foot"></footer>
+
+<script>
+/* ===================== Helpers ===================== */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+let timers = [];
+function clearTimers(){ timers.forEach(t=>{clearInterval(t);clearTimeout(t);}); timers=[]; }
+
+const KEY = 'excretionquest_v1';
+function blank(){ return {name:'', sound:true, lang:'en', showdown:0, organs:{lungs:{},skin:{},kidneys:{},liver:{}}}; }
+let S = (()=>{ try{ const d=JSON.parse(localStorage.getItem(KEY)); if(d && d.organs) return d; }catch(e){} return blank(); })();
+if(!S.lang) S.lang='en';
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} updateHud(); }
+const T = () => TXT[S.lang];
+
+function xp(){
+  let t = S.showdown||0;
+  for(const k in S.organs){ const o=S.organs[k]; t += (o.learn?50:0) + (o.gameBest||0) + (o.quizBest||0)*20; }
+  return t;
+}
+function starsOf(id){ const o=S.organs[id]; return (o.learn?1:0)+(o.gamePass?1:0)+((o.quizBest||0)>=4?1:0); }
+function updateHud(){
+  $('#xp').textContent = '⭐ '+xp()+' XP';
+  $('#snd').textContent = S.sound?'🔊':'🔇';
+  $('#lang').textContent = S.lang==='en' ? '🇮🇩 Bahasa' : '🇬🇧 English';
+  $('#foot').textContent = T().ui.footer;
+  document.documentElement.lang = S.lang;
+}
+
+/* sound */
+let AC=null;
+function tone(f, d=0.12, type='sine', delay=0, vol=0.15){
+  if(!S.sound) return;
+  try{
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+delay;
+    o.type=type; o.frequency.value=f; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+d);
+    o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+d+0.02);
+  }catch(e){}
+}
+const sfx = {
+  good(){ tone(660,.1,'triangle'); tone(880,.14,'triangle',.09); },
+  bad(){ tone(200,.22,'sawtooth',0,.08); },
+  pop(){ tone(520+Math.random()*200,.07,'square',0,.06); },
+  win(){ [523,659,784,1046].forEach((f,i)=>tone(f,.18,'triangle',i*.12)); },
+  click(){ tone(440,.05,'sine',0,.06); }
+};
+function confetti(n=80){
+  const cols=['#ff7aa8','#3a8dde','#ffd166','#2fb36d','#8e5ac8','#f6b26b'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div'); c.className='confetti';
+    c.style.left=Math.random()*100+'vw'; c.style.background=pick(cols);
+    c.style.animationDuration=(1.8+Math.random()*1.8)+'s'; c.style.animationDelay=(Math.random()*.5)+'s';
+    document.body.appendChild(c); setTimeout(()=>c.remove(),4200);
+  }
+}
+
+/* ===================== Bubble the Maltese (drawn from her photo) ===================== */
+function dog(size=96, mood='happy'){
+  const E='#c9d5e3', SH='#e3eaf2';
+  const eyes = mood==='wow'
+    ? '<ellipse cx="56" cy="60" rx="6" ry="6.4" fill="#231d18"/><ellipse cx="84" cy="60" rx="6" ry="6.4" fill="#231d18"/><circle cx="58.2" cy="57.4" r="2.4" fill="#fff"/><circle cx="86.2" cy="57.4" r="2.4" fill="#fff"/><circle cx="54.4" cy="62.6" r="1.1" fill="#fff"/><circle cx="82.4" cy="62.6" r="1.1" fill="#fff"/>'
+    : mood==='sad'
+    ? '<ellipse cx="56" cy="61" rx="5" ry="4.6" fill="#231d18"/><ellipse cx="84" cy="61" rx="5" ry="4.6" fill="#231d18"/><circle cx="57.6" cy="59.5" r="1.6" fill="#fff"/><circle cx="85.6" cy="59.5" r="1.6" fill="#fff"/><path d="M49 53 Q55 51 61 54 M79 54 Q85 51 91 53" stroke="#b9c6d6" stroke-width="2" fill="none" stroke-linecap="round"/>'
+    : '<ellipse cx="56" cy="60" rx="5.2" ry="5.5" fill="#231d18"/><ellipse cx="84" cy="60" rx="5.2" ry="5.5" fill="#231d18"/><circle cx="57.8" cy="58" r="1.9" fill="#fff"/><circle cx="85.8" cy="58" r="1.9" fill="#fff"/>';
+  const mouth = mood==='sad'
+    ? '<path d="M64 85 Q70 81.5 76 85" stroke="#3a2f29" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+    : '<path d="M63 82 Q70 86.5 77 82" stroke="#3a2f29" stroke-width="2.2" fill="none" stroke-linecap="round"/>' + (mood==='wow'?'<path d="M66.5 84.5 Q70 95 73.5 84.5Z" fill="#ff9fb5" stroke="#e87e98" stroke-width=".8"/>':'');
+  const tips = (x0,dir)=>{ let d=''; for(let i=0;i<5;i++){ const x=x0+dir*i*7; d+=`M${x} ${120+(i%2)*4} q${dir*3} 8 ${dir*1} 14 `; } return d; };
+  return `<svg class="dogsvg" width="${size}" height="${size}" viewBox="0 0 140 140" role="img" aria-label="Bubble the Maltese">
+  <defs>
+   <linearGradient id="bhair" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#edf2f8"/></linearGradient>
+   <radialGradient id="bface" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#fffdf8"/><stop offset="1" stop-color="#fbf4ea"/></radialGradient>
+  </defs>
+  <!-- long coat flowing down, wispy ends -->
+  <path d="M70 18 C46 18 34 34 32 54 C30 72 22 88 14 102 C8 112 4 122 3 132 Q11 126 15 135 Q22 128 28 136 Q35 129 42 136 L98 136 Q105 129 112 136 Q118 128 125 135 Q129 126 137 132 C136 122 132 112 126 102 C118 88 110 72 108 54 C106 34 94 18 70 18Z" fill="url(#bhair)" stroke="${E}" stroke-width="2"/>
+  <path d="M22 98 C18 110 14 120 12 130 M30 100 C27 112 25 122 24 132 M118 98 C122 110 126 120 128 130 M110 100 C113 112 115 122 116 132" stroke="${SH}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <!-- chest -->
+  <path d="M46 96 C50 112 58 122 70 124 C82 122 90 112 94 96 Z" fill="#ffffff"/>
+  <path d="M58 104 C60 112 62 118 64 124 M82 104 C80 112 78 118 76 124 M70 106 L70 124" stroke="${SH}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <!-- front paws (lying down) -->
+  <ellipse cx="50" cy="128" rx="13" ry="8" fill="#fff" stroke="${E}" stroke-width="1.8"/><ellipse cx="90" cy="128" rx="13" ry="8" fill="#fff" stroke="${E}" stroke-width="1.8"/>
+  <path d="M45 133 l0 -3.5 M50 134 l0 -3.5 M55 133 l0 -3.5 M85 133 l0 -3.5 M90 134 l0 -3.5 M95 133 l0 -3.5" stroke="#efc3ad" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- collar + bone tag -->
+  <path d="M50 97 Q70 106 90 97" stroke="#ff8a3d" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+  <g transform="translate(70 109) rotate(-8)"><circle cx="-7" cy="-3.2" r="3.4" fill="#a9cdea"/><circle cx="-7" cy="3.2" r="3.4" fill="#a9cdea"/><circle cx="7" cy="-3.2" r="3.4" fill="#a9cdea"/><circle cx="7" cy="3.2" r="3.4" fill="#a9cdea"/><rect x="-7" y="-3.3" width="14" height="6.6" fill="#a9cdea"/><rect x="-4" y="-1.2" width="8" height="2.4" rx="1.2" fill="#ff8a3d"/></g>
+  <!-- face -->
+  <ellipse cx="70" cy="68" rx="25" ry="24" fill="url(#bface)"/>
+  <ellipse cx="55" cy="68" rx="4.5" ry="2.6" fill="#f2d4bb" opacity=".85"/><ellipse cx="85" cy="68" rx="4.5" ry="2.6" fill="#f2d4bb" opacity=".85"/>
+  ${eyes}
+  <!-- moustache: long white locks fanning down from the muzzle -->
+  <path d="M68 74 C58 75 48 82 40 98 C50 92 56 90 63 88 C60 93 58 97 57 103 C62 96 66 91 69 86Z" fill="#fff" stroke="${E}" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M72 74 C82 75 92 82 100 98 C90 92 84 90 77 88 C80 93 82 97 83 103 C78 96 74 91 71 86Z" fill="#fff" stroke="${E}" stroke-width="1.4" stroke-linejoin="round"/>
+  ${mouth}
+  <!-- nose -->
+  <path d="M62.5 71 C62.5 66 77.5 66 77.5 71 C77.5 76 72.5 78.5 70 78.5 C67.5 78.5 62.5 76 62.5 71Z" fill="#221d1a"/>
+  <ellipse cx="67.5" cy="69" rx="2.6" ry="1.3" fill="#6d6560"/>
+  <!-- hair curtains, parted in the middle -->
+  <path d="M70 19 C52 18 38 30 35 50 C32 68 34 86 39 100 C43 88 44 74 46 62 C48 48 56 36 70 33Z" fill="url(#bhair)" stroke="${E}" stroke-width="2"/>
+  <path d="M70 19 C88 18 102 30 105 50 C108 68 106 86 101 100 C97 88 96 74 94 62 C92 48 84 36 70 33Z" fill="url(#bhair)" stroke="${E}" stroke-width="2"/>
+  <path d="M70 19 L70 33" stroke="${E}" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M65 23 C54 27 45 40 41 62 M75 23 C86 27 95 40 99 62 M61 28 C52 35 48 48 46 58 M79 28 C88 35 92 48 94 58 M40 70 C39 80 40 88 41 94 M100 70 C101 80 100 88 99 94" stroke="${SH}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+function guide(text, mood='happy', size=86, id=''){
+  return `<div class="guide"><div class="dog" ${id?`id="${id}-dog"`:''}>${dog(size,mood)}</div><div class="speech" ${id?`id="${id}"`:''}>${text}</div></div>`;
+}
+
+/* ===================== Diagrams (labels depend on language) ===================== */
+const HIT = (d,w=24) => `<path d="${d}" stroke="rgba(0,0,0,0)" stroke-width="${w}" fill="none"/>`;
+
+const LUNG_SVG = L => `<svg viewBox="0 0 400 330">
+<defs><linearGradient id="lgL" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffc9d6"/><stop offset="1" stop-color="#ff8fab"/></linearGradient></defs>
+<g class="part" data-part="rightlung">
+ <path d="M182 108 C120 96 68 150 66 232 C64 282 108 298 172 288 C188 250 190 150 182 108Z" fill="url(#lgL)" stroke="#d85a7f" stroke-width="3"/>
+ <path d="M181 170 C150 172 110 178 72 196" stroke="#c0466b" stroke-width="2.5" fill="none"/>
+ <path d="M180 140 C160 190 130 240 98 284" stroke="#c0466b" stroke-width="2.5" fill="none"/>
+</g>
+<g class="part" data-part="leftlung">
+ <path d="M218 108 C280 96 332 150 334 232 C336 282 292 298 230 288 C240 270 254 252 240 232 C226 214 214 196 218 108Z" fill="url(#lgL)" stroke="#d85a7f" stroke-width="3"/>
+ <path d="M222 142 C258 172 296 220 316 280" stroke="#c0466b" stroke-width="2.5" fill="none"/>
+</g>
+<g class="part" data-part="bronchioles">
+ <path d="M172 140 L150 168 L128 180 M150 168 L146 200 L124 222 M146 200 L160 236 M228 140 L250 168 L272 180 M250 168 L256 204 L278 226 M256 204 L244 240" stroke="#b5365e" stroke-width="3" fill="none" stroke-linecap="round"/>
+ ${HIT("M172 140 L150 168 L128 180 M150 168 L146 200 L124 222 M146 200 L160 236 M228 140 L250 168 L272 180 M250 168 L256 204 L278 226 M256 204 L244 240",14)}
+</g>
+<g class="part" data-part="bronchi">
+ <path d="M200 96 L200 112 C190 122 182 130 170 142 M200 112 C210 122 218 130 230 142" stroke="#f4d6dc" stroke-width="14" fill="none" stroke-linecap="round"/>
+ <path d="M200 96 L200 112 C190 122 182 130 170 142 M200 112 C210 122 218 130 230 142" stroke="#c98a99" stroke-width="2" fill="none" stroke-dasharray="3 5"/>
+ ${HIT("M200 96 L200 112 C190 122 182 130 170 142 M200 112 C210 122 218 130 230 142",24)}
+</g>
+<g class="part" data-part="trachea">
+ <rect x="189" y="10" width="22" height="90" rx="7" fill="#f6dfe4" stroke="#c98a99" stroke-width="2.5"/>
+ <path d="M189 22 h22 M189 34 h22 M189 46 h22 M189 58 h22 M189 70 h22 M189 82 h22" stroke="#c98a99" stroke-width="2"/>
+</g>
+<g class="part" data-part="diaphragm">
+ <path d="M36 312 Q200 248 364 312" stroke="#b5651d" stroke-width="11" fill="none" stroke-linecap="round"/>
+ ${HIT("M36 312 Q200 248 364 312",26)}
+</g>
+<g class="part" data-part="alveoli">
+ <circle cx="350" cy="56" r="42" fill="#fff" stroke="#d85a7f" stroke-width="2" stroke-dasharray="5 4"/>
+ <path d="M318 40 C330 20 370 18 384 44 M316 76 C334 96 372 96 386 70" stroke="#e63946" stroke-width="3" fill="none"/>
+ <path d="M322 30 C340 14 372 22 380 36" stroke="#3a6fd8" stroke-width="3" fill="none"/>
+ <circle cx="338" cy="48" r="11" fill="#ffb3c6" stroke="#d85a7f" stroke-width="2"/><circle cx="360" cy="42" r="11" fill="#ffb3c6" stroke="#d85a7f" stroke-width="2"/>
+ <circle cx="352" cy="64" r="11" fill="#ffb3c6" stroke="#d85a7f" stroke-width="2"/><circle cx="332" cy="68" r="10" fill="#ffb3c6" stroke="#d85a7f" stroke-width="2"/>
+ <circle cx="372" cy="60" r="10" fill="#ffb3c6" stroke="#d85a7f" stroke-width="2"/>
+ <path d="M344 76 L326 120" stroke="#b5365e" stroke-width="3"/>
+ <text x="350" y="112" font-size="11" text-anchor="middle" fill="#c0466b" font-weight="800">${L.zoom}</text>
+</g>
+</svg>`;
+
+const KIDNEY_SVG = L => `<svg viewBox="0 0 400 330">
+<g class="part" data-part="cortex"><path d="M200 30 C290 30 330 100 320 170 C310 250 260 300 190 290 C130 282 100 240 120 200 C135 175 175 175 175 155 C175 135 135 130 120 110 C105 75 140 30 200 30Z" fill="#d9605a" stroke="#a63f3a" stroke-width="3"/></g>
+<g class="part" data-part="medulla">
+ <path d="M213 56 L262 70 L207 136Z M290 108 L300 160 L216 156Z M294 192 L272 244 L213 176Z M240 264 L192 270 L203 196Z" fill="#9e3b36" stroke="#7d2a26" stroke-width="2"/>
+ <path d="M236 64 L210 128 M294 134 L222 156 M284 218 L214 180 M216 266 L204 202" stroke="#c4625c" stroke-width="1.5"/>
+</g>
+<g class="part" data-part="pelvis"><path d="M216 128 C240 150 240 186 214 206 C200 200 186 186 172 174 L172 152 C186 144 200 136 216 128Z" fill="#ffe08a" stroke="#d4a72c" stroke-width="2.5"/></g>
+<g class="part" data-part="artery"><path d="M14 140 L182 150" stroke="#e63946" stroke-width="9" stroke-linecap="round"/>${HIT("M14 140 L182 150",20)}</g>
+<g class="part" data-part="vein"><path d="M14 162 L182 164" stroke="#3a6fd8" stroke-width="10" stroke-linecap="round"/>${HIT("M14 162 L182 164",18)}</g>
+<g class="part" data-part="ureter"><path d="M178 180 C150 188 140 212 140 322" stroke="#d4a72c" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M178 180 C150 188 140 212 140 322" stroke="#ffd166" stroke-width="9" fill="none" stroke-linecap="round"/>${HIT("M178 180 C150 188 140 212 140 322",26)}</g>
+<text x="16" y="132" font-size="11" fill="#e63946" font-weight="800">${L.bloodIn}</text>
+<text x="16" y="182" font-size="11" fill="#3a6fd8" font-weight="800">${L.bloodOut}</text>
+<text x="150" y="318" font-size="11" fill="#b38600" font-weight="800">${L.toBladder}</text>
+</svg>`;
+
+const NEPHRON_SVG = L => `<svg viewBox="0 0 400 330">
+<rect x="0" y="0" width="400" height="150" fill="#fdeae6"/><rect x="0" y="150" width="400" height="180" fill="#f7d3cb"/>
+<text x="8" y="16" font-size="11" fill="#a0574e" font-weight="800">${L.cortex}</text><text x="8" y="166" font-size="11" fill="#a0574e" font-weight="800">${L.medulla}</text>
+<g class="part" data-part="capsule"><path d="M97 60 A30 30 0 1 1 67 60" stroke="#e76f51" stroke-width="9" fill="none" stroke-linecap="round"/>${HIT("M97 60 A30 30 0 1 1 67 60",22)}</g>
+<g class="part" data-part="glomerulus">
+ <path d="M14 30 L72 76" stroke="#e63946" stroke-width="6" stroke-linecap="round"/><path d="M90 76 L126 26" stroke="#c1121f" stroke-width="5" stroke-linecap="round"/>
+ <circle cx="73" cy="80" r="8" fill="#e63946" stroke="#b3202c" stroke-width="2"/><circle cx="89" cy="79" r="8" fill="#e63946" stroke="#b3202c" stroke-width="2"/>
+ <circle cx="81" cy="93" r="8" fill="#e63946" stroke="#b3202c" stroke-width="2"/><circle cx="70" cy="96" r="7" fill="#e63946" stroke="#b3202c" stroke-width="2"/><circle cx="93" cy="94" r="7" fill="#e63946" stroke="#b3202c" stroke-width="2"/>
+</g>
+<g class="part" data-part="pct"><path d="M110 98 C128 82 140 112 155 96 C170 80 176 116 190 100 C200 90 205 94 205 112" stroke="#f4a261" stroke-width="9" fill="none" stroke-linecap="round"/>${HIT("M110 98 C128 82 140 112 155 96 C170 80 176 116 190 100 C200 90 205 94 205 112",22)}</g>
+<g class="part" data-part="loop"><path d="M205 112 L205 288 C205 314 240 314 240 288 L240 122" stroke="#e9c46a" stroke-width="9" fill="none" stroke-linecap="round"/>${HIT("M205 112 L205 288 C205 314 240 314 240 288 L240 122",24)}</g>
+<g class="part" data-part="dct"><path d="M240 122 C250 92 270 122 285 96 C300 70 310 106 322 90 L336 90" stroke="#2a9d8f" stroke-width="9" fill="none" stroke-linecap="round"/>${HIT("M240 122 C250 92 270 122 285 96 C300 70 310 106 322 90 L336 90",22)}</g>
+<g class="part" data-part="duct"><path d="M344 24 L344 318" stroke="#457b9d" stroke-width="13" stroke-linecap="round"/>${HIT("M344 24 L344 318",28)}</g>
+<text x="14" y="50" font-size="10" fill="#c1121f" font-weight="800">${L.bloodIn}</text>
+<text x="356" y="312" font-size="10" fill="#457b9d" font-weight="800">${L.urine}</text><text x="356" y="324" font-size="10" fill="#457b9d" font-weight="800">↓</text>
+</svg>`;
+
+const SKIN_SVG = L => `<svg viewBox="0 0 400 330">
+<g class="part" data-part="hypo"><rect x="0" y="214" width="400" height="116" fill="#fff1c9"/>
+ <ellipse cx="40" cy="290" rx="24" ry="16" fill="#ffe39a" stroke="#e8c15a" stroke-width="2"/><ellipse cx="96" cy="300" rx="22" ry="15" fill="#ffe39a" stroke="#e8c15a" stroke-width="2"/>
+ <ellipse cx="160" cy="292" rx="24" ry="16" fill="#ffe39a" stroke="#e8c15a" stroke-width="2"/><ellipse cx="226" cy="302" rx="22" ry="14" fill="#ffe39a" stroke="#e8c15a" stroke-width="2"/>
+ <ellipse cx="292" cy="292" rx="24" ry="16" fill="#ffe39a" stroke="#e8c15a" stroke-width="2"/><ellipse cx="358" cy="300" rx="24" ry="15" fill="#ffe39a" stroke="#e8c15a" stroke-width="2"/>
+</g>
+<g class="part" data-part="dermis"><rect x="0" y="76" width="400" height="140" fill="#ffd3cf"/></g>
+<g class="part" data-part="epidermis">
+ <path d="M0 40 Q50 32 100 40 T200 40 T300 40 T400 40 L400 82 Q350 92 300 80 T200 82 T100 80 T0 82Z" fill="#f2c09a" stroke="#d99a6c" stroke-width="2"/>
+ <path d="M0 40 Q50 32 100 40 T200 40 T300 40 T400 40 L400 50 Q350 42 300 50 T200 50 T100 50 T0 50Z" fill="#d9a27a"/>
+</g>
+<g class="part" data-part="vessels">
+ <path d="M0 234 C80 224 150 240 400 230" stroke="#e63946" stroke-width="6" fill="none"/>
+ <path d="M0 250 C100 240 200 258 400 246" stroke="#3a6fd8" stroke-width="6" fill="none"/>
+ <path d="M318 232 C312 170 352 170 346 247" stroke="#e63946" stroke-width="3" fill="none"/><path d="M60 228 C56 180 86 180 84 246" stroke="#3a6fd8" stroke-width="3" fill="none"/>
+ ${HIT("M0 234 C80 224 150 240 400 230 M0 250 C100 240 200 258 400 246 M318 232 C312 170 352 170 346 247",16)}
+</g>
+<g class="part" data-part="nerve"><path d="M400 278 C340 266 220 206 192 152 C186 140 182 122 180 104 M180 104 l-9 -7 M180 104 l7 -9" stroke="#e2b400" stroke-width="4" fill="none" stroke-linecap="round"/>${HIT("M400 278 C340 266 220 206 192 152 C186 140 182 122 180 104",18)}</g>
+<g class="part" data-part="hair">
+ <path d="M96 60 L100 190 C102 207 122 207 122 190 L116 60" fill="#f7c4bd" stroke="#8d5a3b" stroke-width="3"/>
+ <ellipse cx="111" cy="194" rx="12" ry="9" fill="#c98a5a"/>
+ <path d="M100 0 L104 40 L110 188" stroke="#5a3a22" stroke-width="5" fill="none" stroke-linecap="round"/>
+</g>
+<g class="part" data-part="oil">
+ <circle cx="134" cy="104" r="9" fill="#ffe08a" stroke="#d4a72c" stroke-width="2"/><circle cx="143" cy="118" r="9" fill="#ffe08a" stroke="#d4a72c" stroke-width="2"/><circle cx="130" cy="122" r="8" fill="#ffe08a" stroke="#d4a72c" stroke-width="2"/>
+ <path d="M126 108 L117 100" stroke="#d4a72c" stroke-width="3"/>
+</g>
+<g class="part" data-part="sweat">
+ <path d="M262 186 C255 160 272 140 262 115 C254 95 268 70 260 48" stroke="#4aa3df" stroke-width="4" fill="none"/>
+ <path d="M250 196 c10 -14 24 -4 18 6 c-6 10 -22 6 -16 -5 c6 -11 26 -10 26 4 c0 13 -22 16 -24 3 c-2 -12 18 -16 20 -4" stroke="#2f86c4" stroke-width="5" fill="none" stroke-linecap="round"/>
+ ${HIT("M262 186 C255 160 272 140 262 115 C254 95 268 70 260 48",16)}
+</g>
+<g class="part" data-part="pore">
+ <path d="M248 36 Q260 54 272 36Z" fill="#ffffff" stroke="#4aa3df" stroke-width="2.5"/>
+ <path d="M260 4 C266 14 268 19 260 23 C252 19 254 14 260 4Z" fill="#6ec1ff"/><path d="M276 12 C280 19 281 22 276 25 C271 22 272 19 276 12Z" fill="#6ec1ff"/>
+ <circle cx="260" cy="28" r="16" fill="rgba(0,0,0,0)"/>
+</g>
+</svg>`;
+
+const LIVER_SVG = L => `<svg viewBox="0 0 400 330">
+<g class="part" data-part="rightlobe"><path d="M30 130 C30 70 120 45 215 50 C222 120 220 190 205 245 C140 255 60 225 30 130Z" fill="#a0442c" stroke="#6e2a1a" stroke-width="3"/><path d="M70 110 C90 95 120 90 150 92" stroke="#c26a4e" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+<g class="part" data-part="leftlobe"><path d="M215 50 C290 52 365 70 375 105 C360 150 280 200 205 245 C220 190 222 120 215 50Z" fill="#b5553a" stroke="#6e2a1a" stroke-width="3"/><path d="M250 80 C290 80 320 88 340 100" stroke="#d27a5c" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+<g class="part" data-part="portal"><path d="M268 330 C262 290 246 250 232 206 M232 206 L214 166 M232 206 L262 170" stroke="#6a4c93" stroke-width="10" fill="none" stroke-linecap="round"/>${HIT("M268 330 C262 290 246 250 232 206 M232 206 L214 166 M232 206 L262 170",24)}</g>
+<g class="part" data-part="bileduct"><path d="M182 244 C196 228 204 222 208 212 M208 212 L222 322 M208 212 L196 172 M208 212 L238 178" stroke="#2e7d32" stroke-width="6" fill="none" stroke-linecap="round"/>${HIT("M182 244 C196 228 204 222 208 212 M208 212 L222 322 M208 212 L196 172 M208 212 L238 178",20)}</g>
+<g class="part" data-part="gallbladder"><path d="M150 236 C138 270 160 302 182 294 C198 287 198 258 184 236Z" fill="#5cbf60" stroke="#2e7d32" stroke-width="3"/></g>
+<text x="140" y="324" font-size="11" fill="#2e7d32" font-weight="800">${L.bileOut}</text>
+<text x="272" y="322" font-size="11" fill="#6a4c93" font-weight="800">${L.fromGut}</text>
+</svg>`;
+
+/* Structure shared by both languages */
+const META = {
+  lungs:{emoji:'🫁', cls:'z-lungs', svgs:[LUNG_SVG]},
+  skin:{emoji:'🖐️', cls:'z-skin', svgs:[SKIN_SVG]},
+  kidneys:{emoji:'🫘', cls:'z-kidneys', svgs:[KIDNEY_SVG, NEPHRON_SVG]},
+  liver:{emoji:'🟤', cls:'z-liver', svgs:[LIVER_SVG]}
+};
+const ORDER = ['lungs','skin','kidneys','liver'];
+
+/* ===================== TEXT: ENGLISH + BAHASA INDONESIA ===================== */
+const TXT = {
+/* ------------------------------ ENGLISH ------------------------------ */
+en:{
+ ui:{
+  footer:"ExcretionQuest · Junior High Biology · Lungs · Skin · Kidneys · Liver",
+  sub:"Bubble's Clean-Up Adventure through the Excretory System",
+  desc:"Explore the <b>lungs, skin, kidneys and liver</b>. Learn their parts, play mini-games, answer trivia, and beat the final <b>Excretion Showdown</b> to earn your certificate!",
+  namePh:"Type your name…", start:"Let's go! 🐾",
+  hi:n=>`Hi <b>${n}</b>! I'm <b>Bubble</b> 🐾. Your body makes waste all day long — and four organs work hard to get rid of it. Pick an organ to explore!`,
+  dyk:"Did you know?",
+  whatEx:"🧠 What is excretion?",
+  whatExBody:"Excretion is removing <b>metabolic waste</b> — waste made by your body's cells — like CO₂, urea and excess salt. (Getting rid of undigested food as feces is called <i>egestion</i>, not excretion!)",
+  excretes:"Excretes:", mastered:"🏅 Mastered",
+  bossT:"Excretion Showdown", bossD:"12 timed trivia questions from ALL organs. Build streaks for bonus points!",
+  bossTip:"Tip: master all four organs first for the best score.", best:"Best", pts:"pts",
+  rule:"Each organ: ⭐ Learn all parts · ⭐ Win the mini-game · ⭐ Score 4/5 in trivia",
+  change:"✏️ Change player", reset:"🔄 Reset progress", resetSure:"⚠️ Tap again to confirm reset",
+  map:"← Map", mapBtn:"🗺️ Map", learn:"📖 Learn", play:"🎮 Mini-game", trivia:"❓ Trivia",
+  where:"📍 Where is it?", wasteQ:"🗑️ What does it excrete?", how:"⚙️ How does it work?",
+  explored:(a,b)=>`Explored ${a}/${b} parts`, tapT:"👆 Tap a part!", tapB:"Tap any part of the diagram, or a label above, to find out what it does.",
+  tapView:"Explore this view too.",
+  learnDone:n=>`Woof-tastic! You explored every part of the ${n}! ⭐ Learn star earned. Ready for the mini-game?`,
+  toPlay:"🎮 Play the mini-game →", again:"🔁 Play again", toQuiz:"❓ Go to Trivia →",
+  gameStar:"⭐ Mini-game star earned!", tryAgain:"Try again — you've got this! 🐾",
+  question:"Question", streak:"Streak", next:"Next question →", results:"See results →",
+  thinkT:['Quick! Think fast! ⚡','You can do it! 🐾','Streaks give bonus points! 🔥'],
+  think:['Think carefully… 🤔','Take your time! 🐾','I believe in you!'],
+  good:['Woof! Correct! 🐾','Paw-some!','You’re a natural scientist! 🔬','Tail-wagging good!'],
+  bad:['Oops! Let’s learn from it.','Almost! Read the tip below. 🐾'],
+  timeUp:'⏰ Time’s up! Here’s the answer:', streakBonus:'(🔥 streak bonus!)',
+  quizIntro:n=>`<b>${n} Trivia!</b> 5 questions. Score <b>4 or 5</b> to earn the trivia star. Ready?`,
+  quizStart:"Start trivia ❓",
+  quizPass:(c,first)=>`You got <b>${c}/5</b>! ${first?'⭐ Trivia star earned!':''}`,
+  quizMaster:n=>`🏅 You've MASTERED the ${n}!`,
+  quizFail:c=>`You got <b>${c}/5</b>. You need 4 for the star — try again!`,
+  tryQ:"🔁 Try again", review:"📖 Review Learn", nextOrg:n=>`Next: ${n} →`, toBoss:"🏆 Excretion Showdown →",
+  /* lungs game */
+  lgIntro:"<b>Exhale Express!</b> Molecules are floating in an alveolus. Tap the <b>waste</b> — CO₂ and H₂O — to breathe them out. Don't tap O₂: your cells need it! Score <b>120+</b> in 30 seconds to win.",
+  lgLeg:["CO₂ waste +10","H₂O vapour +10","O₂ keep it! −15"], score:"Score", ready:"Get ready to breathe out!", startL:"Start! 💨",
+  keepO2:"−15 Keep O₂!",
+  lgWin:s=>`Amazing breathing! You scored <b>${s}</b>.`, lgLose:s=>`You scored <b>${s}</b> — you need 120.`,
+  lgDetail:"Remember: CO₂ and water vapour are excreted by the lungs. O₂ goes the other way — INTO the blood!",
+  /* skin game */
+  sgIntro:"<b>Sweat Spotter!</b> I'll name a part of the skin — you find it on the diagram. Win with <b>3 mistakes or fewer</b>!",
+  part:"Part", mistakes:"Mistakes", sgGood:['Woof! Correct! 🐾','Paw-some!','Exactly right!','You know your skin!'],
+  sgWrong:n=>`Oops — that's the <b>${n}</b>. Try again!`,
+  sgWin:m=>`Skin expert! Only <b>${m}</b> mistake${m===1?'':'s'}.`, sgLose:m=>`You made <b>${m}</b> mistakes.`,
+  sgDetail:"Sweat glands (dermis) → duct → pore → sweat evaporates → you cool down!",
+  /* kidney game */
+  kgIntro:"<b>Nephron Filter Factory!</b> Decide what happens to each substance in the kidney. Get <b>7 out of 10</b> right, then finish the order puzzles!",
+  item:"Item", whatHappens:"What happens to it?", kgGood:['Woof! Correct! 🐾','Paw-some filtering!','Your nephrons would be proud!'], kgBad:'Not quite — check the tip below!',
+  nextBtn:"Next →", toPuzzle:"Order puzzles →",
+  puzzle:(s,t)=>`<b>Order puzzle ${s}/2:</b> ${t} Tap them in the right order!`, buildHint:"Tap below to build the order…",
+  perfect:"Perfect order! 🐾", notYet:"Hmm, not that one yet. Think: what happens <b>first</b>?",
+  kgWin:c=>`Filter master! You sorted <b>${c}/10</b> correctly.`, kgLose:c=>`You sorted <b>${c}/10</b> — you need 7.`,
+  kgDetail:m=>`Order-puzzle mistakes: ${m}. Remember: big things stay in blood, useful things are reabsorbed, wastes leave in urine!`,
+  /* liver game */
+  mgIntro:"<b>Liver Lab Match!</b> Flip two cards to match each liver substance (purple) with what happens to it (yellow). Match all 6 pairs in <b>16 moves or fewer</b> to win!",
+  moves:"Moves", pairs:"Pairs", match:(a,b)=>`Match! <b>${a}</b> → ${b}. 🐾`, noPair:"Not a pair — remember where they are!",
+  mgWin:m=>`Brilliant memory! All pairs in <b>${m}</b> moves.`, mgLose:m=>`All pairs found in <b>${m}</b> moves — aim for 16 or fewer.`,
+  mgDetail:"The liver: breaks down old red blood cells → bile pigments, turns ammonia → urea, makes bile and stores glycogen.",
+  /* showdown + certificate */
+  sdIntro:"This is the BIG one! <b>12 questions</b> from all four organs, <b>15 seconds</b> each. Faster answers = more points, and 3 correct in a row gives a 🔥 streak bonus. Finish to get your certificate!",
+  sdGo:"I'm ready! 🚀",
+  certT:"Certificate of Achievement", certs:"This certifies that", certDid:"completed the <b>ExcretionQuest Showdown</b> and earned the title",
+  points:"points", correct:"correct", bestStreak:"Best streak", orgStars:"Organ stars", signed:"Signed: Bubble the Maltese 🐾",
+  print:"🖨️ Print / Save as PDF", sdAgain:"🔁 Play Showdown again", shot:"📸 Take a screenshot to share your certificate!",
+  ranks:['Excretion Expert','Clean-Up Champion','Rising Scientist','Curious Cadet'],
+  locale:'en-GB'
+ },
+ svg:{zoom:"zoom ×1000", bloodIn:"blood in", bloodOut:"blood out", toBladder:"urine ↓ to bladder", cortex:"CORTEX", medulla:"MEDULLA", urine:"urine", bileOut:"bile → intestine", fromGut:"blood from gut"},
+ organs:{
+  lungs:{ name:'Lungs', waste:'CO₂ + water vapour',
+   hello:"Welcome to the Lungs! Every time you breathe OUT, you're excreting waste. Tap each part to explore. 🫁",
+   where:"In the chest (thoracic) cavity, protected by the ribs and wrapped in a thin membrane called the <b>pleura</b>.",
+   wasteL:"<b>Carbon dioxide (CO₂)</b> and <b>water vapour (H₂O)</b> — made by your cells during respiration.",
+   how:["Cells: glucose + O₂ → CO₂ + H₂O + energy","Blood carries CO₂ to the lungs","CO₂ diffuses from capillaries into the alveoli","You breathe it out! 💨"],
+   views:[{name:'Lungs', parts:{
+    trachea:["Trachea (windpipe)","A tube kept open by C-shaped rings of cartilage. Air full of CO₂ and water vapour leaves your body through here when you breathe out."],
+    bronchi:["Bronchi","The trachea splits into two bronchi — one going into each lung."],
+    bronchioles:["Bronchioles","Thinner and thinner branching tubes, like an upside-down tree, that carry air to the alveoli."],
+    alveoli:["Alveoli","Hundreds of millions of tiny air sacs, each wrapped in capillaries. Here CO₂ <b>diffuses</b> out of the blood into the air (high → low concentration), while O₂ diffuses in."],
+    rightlung:["Right lung","Has <b>3 lobes</b>. It's on YOUR left in the picture because we're looking at the body from the front!"],
+    leftlung:["Left lung","Has only <b>2 lobes</b> and is a little smaller, leaving a notch to make room for the heart. ❤️"],
+    diaphragm:["Diaphragm","A dome-shaped muscle under the lungs. When it relaxes and moves up, the chest gets smaller and CO₂-rich air is pushed out (exhalation)."]
+   }}]},
+  skin:{ name:'Skin', waste:'Sweat',
+   hello:"This is the Skin — your body's BIGGEST organ! It excretes sweat and keeps you cool. Tap every part! 💦",
+   where:"Covers your whole body — about <b>2 m²</b> in an adult. It's the <b>largest organ</b> of the human body.",
+   wasteL:"<b>Sweat</b> — mostly water, plus salts (NaCl) and a little <b>urea</b>.",
+   how:["Body gets hot 🔥","The hypothalamus (in the brain) sends a signal","Sweat glands take water, salt & urea from the blood","Sweat leaves through pores and evaporates → you cool down ❄️"],
+   views:[{name:'Skin', parts:{
+    epidermis:["Epidermis","The thin outer layer. Its top (stratum corneum) is dead cells that keep flaking off. Its base (stratum germinativum) makes new cells and the pigment <b>melanin</b>."],
+    dermis:["Dermis","The thick middle layer — home to sweat glands, oil glands, hair roots, blood vessels and nerves."],
+    hypo:["Hypodermis (fat layer)","Fatty tissue under the dermis. It stores energy, cushions your body and keeps you warm."],
+    sweat:["Sweat gland","A coiled tube in the dermis that collects water, salts and a little urea from the blood to make <b>sweat</b>."],
+    pore:["Pore","The tiny opening where sweat leaves the skin. As sweat evaporates, it takes heat away with it."],
+    oil:["Sebaceous (oil) gland","Makes <b>sebum</b>, an oil that keeps hair and skin soft and waterproof. Blocked oil glands can cause acne!"],
+    hair:["Hair & follicle","Hair grows from the follicle. Tiny muscles pull hairs upright when you're cold — goosebumps!"],
+    vessels:["Blood vessels","When you're hot they widen (vasodilation) so more heat escapes through the skin. When you're cold they narrow."],
+    nerve:["Nerve endings","Sense touch, pressure, pain, heat and cold — and report to the brain."]
+   }}]},
+  kidneys:{ name:'Kidneys', waste:'Urine',
+   hello:"The Kidneys are your body's water-cleaning factory! Explore the kidney, then switch to the Nephron view. 🫘",
+   where:"A pair of bean-shaped organs at the back of the abdomen, on each side of the spine — each about the size of your fist.",
+   wasteL:"<b>Urine</b> — water, <b>urea</b>, uric acid, salts and ammonia.",
+   how:["<b>Filtration</b> in the glomerulus → primary urine","<b>Reabsorption</b> in the proximal tubule → secondary urine","<b>Augmentation</b> in the distal tubule → real urine","Kidney → ureter → bladder → urethra 🚽"],
+   views:[
+    {name:'Kidney', parts:{
+     cortex:["Cortex","The outer layer. It holds the glomeruli and Bowman's capsules — where blood filtering begins."],
+     medulla:["Medulla (renal pyramids)","The inner part, made of cone-shaped pyramids packed with tubules (loops of Henle and collecting ducts)."],
+     pelvis:["Renal pelvis","A funnel-shaped space that collects urine from the collecting ducts and passes it into the ureter."],
+     ureter:["Ureter","A tube that carries urine down to the urinary bladder. The journey: kidney → ureter → bladder → urethra → out!"],
+     artery:["Renal artery","Brings 'dirty' blood, full of wastes like urea, into the kidney."],
+     vein:["Renal vein","Carries cleaned blood out of the kidney and back toward the heart."]
+    }},
+    {name:'Nephron', parts:{
+     glomerulus:["Glomerulus","A knot of tiny capillaries. Blood pressure pushes water, glucose, salts, amino acids and urea out: <b>1️⃣ FILTRATION</b>. Blood cells and proteins are too big and stay in the blood. The liquid made is <b>primary urine</b>."],
+     capsule:["Bowman's capsule","A cup wrapped around the glomerulus that catches the filtrate (primary urine)."],
+     pct:["Proximal tubule","<b>2️⃣ REABSORPTION</b>: useful things — glucose, amino acids, most of the water and some salts — are taken back into the blood. What's left is <b>secondary urine</b>, rich in urea."],
+     loop:["Loop of Henle","A U-shaped tube that dips into the medulla and helps reabsorb more water, so urine gets concentrated."],
+     dct:["Distal tubule","<b>3️⃣ AUGMENTATION</b>: extra wastes (like H⁺ ions, ammonia and more urea) are added. Now it's real urine!"],
+     duct:["Collecting duct","Collects urine from many nephrons and carries it to the renal pelvis."]
+    }}]},
+  liver:{ name:'Liver', waste:'Bile (+ makes urea)',
+   hello:"Meet the Liver — the body's chemical factory and the largest INTERNAL organ. Tap each part! 🧪",
+   where:"Upper right of the abdomen, just under the diaphragm. It's the <b>largest internal organ</b> (about 1.5 kg).",
+   wasteL:"<b>Bile</b>, containing bile pigments (<b>bilirubin</b> & <b>biliverdin</b>). It also turns toxic ammonia into <b>urea</b>.",
+   how:["Old red blood cells (≈120 days old) are broken down","Hemoglobin → bile pigments → bile","Bile goes to the intestine and makes feces brown","Ammonia → urea → blood → kidneys → urine"],
+   views:[{name:'Liver', parts:{
+    rightlobe:["Right lobe","The biggest part of the liver. Liver cells here break down hemoglobin from old red blood cells and convert ammonia into urea."],
+    leftlobe:["Left lobe","Smaller, stretching toward the stomach. Same hard-working liver cells! The liver also stores glucose as <b>glycogen</b> and removes toxins."],
+    gallbladder:["Gallbladder","A small green pouch under the liver that stores and concentrates bile until you eat fatty food."],
+    bileduct:["Bile duct","Carries bile from the liver and gallbladder into the small intestine (duodenum), where it breaks fat into tiny droplets (emulsification)."],
+    portal:["Hepatic portal vein","Brings blood from the intestines — full of nutrients (and sometimes toxins) — to the liver to be processed."]
+   }}]}
+ },
+ quiz:{
+  lungs:[
+   {q:"Which wastes are excreted by the lungs?",o:["Carbon dioxide and water vapour","Oxygen and nitrogen","Urea and salt","Bile pigments"],why:"CO₂ and H₂O are by-products of cellular respiration: glucose + O₂ → CO₂ + H₂O + energy."},
+   {q:"Where in the lungs does gas exchange happen?",o:["Alveoli","Trachea","Bronchi","Diaphragm"],why:"The alveoli are tiny air sacs with very thin walls, wrapped in capillaries — perfect for diffusion."},
+   {q:"How many lobes does the RIGHT lung have?",o:["3","2","1","4"],why:"Right lung = 3 lobes, left lung = 2 lobes (it leaves room for the heart)."},
+   {q:"You blow through a straw into limewater and it turns cloudy. Which gas does this prove you breathe out?",o:["Carbon dioxide","Oxygen","Nitrogen","Hydrogen"],why:"CO₂ reacts with limewater (calcium hydroxide) to form calcium carbonate, which makes it milky."},
+   {q:"How does CO₂ move from the blood into the alveoli?",o:["By diffusion, from high to low concentration","It is pumped by the stomach","By osmosis of water","It is carried by bile"],why:"There is more CO₂ in the blood than in the alveoli, so it diffuses into the air sacs."}
+  ],
+  skin:[
+   {q:"What is the main excretory product of the skin?",o:["Sweat","Urine","Bile","Oxygen"],why:"Sweat glands in the skin excrete sweat."},
+   {q:"Sweat is mainly made of…",o:["Water, salts and a little urea","Blood and protein","Glucose and fat","Bile pigments"],why:"Sweat is about 99% water, plus salts like NaCl and small amounts of urea."},
+   {q:"In which skin layer are the sweat glands found?",o:["Dermis","Epidermis","Hair shaft","Stratum corneum"],why:"Sweat glands are coiled in the dermis, with a duct that leads up to a pore."},
+   {q:"Why do we sweat more on a hot day?",o:["Evaporating sweat cools the body","To make the skin shiny","To excrete extra oxygen","To grow more hair"],why:"Evaporation takes heat away from the skin, keeping body temperature around 37 °C."},
+   {q:"The outer part of the epidermis, made of dead cells, is called the…",o:["Stratum corneum","Stratum germinativum","Hypodermis","Sebaceous gland"],why:"The stratum corneum (horny layer) is dead cells that protect you and keep flaking off."}
+  ],
+  kidneys:[
+   {q:"What are the tiny filtering units of the kidney called?",o:["Nephrons","Alveoli","Neurons","Villi"],why:"Each kidney has about one million nephrons!"},
+   {q:"What is the FIRST stage of urine formation, which happens in the glomerulus?",o:["Filtration","Reabsorption","Augmentation","Digestion"],why:"Filtration happens first, producing primary urine (filtrate)."},
+   {q:"Which substance should NOT be in the urine of a healthy person?",o:["Glucose","Water","Urea","Salt"],why:"Glucose is completely reabsorbed. Glucose in urine (glucosuria) can be a sign of diabetes mellitus."},
+   {q:"What is the correct path of urine leaving the body?",o:["Kidney → ureter → bladder → urethra","Kidney → urethra → bladder → ureter","Bladder → kidney → ureter → urethra","Ureter → kidney → urethra → bladder"],why:"Ureters carry urine to the bladder; the urethra carries it out of the body."},
+   {q:"What gives urine its yellow colour?",o:["Urochrome, from broken-down bile pigments","Glucose","Red blood cells","Chlorophyll"],why:"Urochrome comes from the breakdown of bile pigments — a link between the liver and kidneys!"}
+  ],
+  liver:[
+   {q:"Which substance does the liver excrete?",o:["Bile","Sweat","Urine","Carbon dioxide"],why:"The liver makes bile, which carries bile pigments out of the body through the intestines."},
+   {q:"Bile pigments (bilirubin and biliverdin) come from…",o:["The hemoglobin of old red blood cells","Digested fat","The air we breathe","Our bones"],why:"Red blood cells live about 120 days. Then their hemoglobin is broken down into bile pigments."},
+   {q:"The liver turns toxic ammonia into…",o:["Urea","Glucose","Oxygen","Bile salts"],why:"Ammonia comes from breaking down amino acids. Urea is much less toxic and is removed by the kidneys."},
+   {q:"Where is bile stored?",o:["Gallbladder","Urinary bladder","Stomach","Pancreas"],why:"The gallbladder stores bile and releases it into the duodenum when you eat fatty food."},
+   {q:"If the liver can't process bilirubin well, the skin and eyes turn yellow. This is called…",o:["Jaundice","Acne","Asthma","Kidney stones"],why:"Jaundice happens when bilirubin builds up in the blood — often a sign of liver trouble like hepatitis."}
+  ]
+ },
+ extra:[
+  {q:"What is the LARGEST organ of the human body?",o:["Skin","Liver","Lungs","Intestine"],why:"The skin! The liver is the largest INTERNAL organ."},
+  {q:"What is the largest INTERNAL organ?",o:["Liver","Kidney","Heart","Stomach"],why:"The liver weighs about 1.5 kg in adults."},
+  {q:"About how long does a red blood cell live?",o:["120 days","12 days","2 years","10 years"],why:"After about 120 days, old red blood cells are broken down in the liver and spleen."},
+  {q:"Which part of the brain controls body temperature and sweating?",o:["Hypothalamus","Cerebellum","Medulla oblongata","Cerebrum"],why:"The hypothalamus works like the body's thermostat."},
+  {q:"Which of these is NOT an excretory organ?",o:["Stomach","Skin","Liver","Lungs"],why:"The stomach digests food. Getting rid of undigested food (feces) is called egestion, not excretion."},
+  {q:"The urea in your urine was first made in the…",o:["Liver","Kidneys","Bladder","Skin"],why:"The liver makes urea; the kidneys just filter it out of the blood. Teamwork!"},
+  {q:"How much urine does a healthy adult make per day?",o:["About 1–2 litres","About 50 mL","About 10 litres","About 180 litres"],why:"The kidneys filter ~180 L of fluid a day but reabsorb almost all of it!"},
+  {q:"What does 'excretion' mean?",o:["Removing metabolic waste made by body cells","Removing undigested food","Breathing in oxygen","Digesting fat"],why:"Excretion removes waste from metabolism (CO₂, urea, sweat…). Removing undigested food is egestion."},
+  {q:"Breathing onto a cold mirror makes it foggy. This shows we breathe out…",o:["Water vapour","Oxygen","Bile","Salt"],why:"The water vapour in your breath condenses into tiny droplets on the cold glass."},
+  {q:"Kidney stones are mostly formed from…",o:["Calcium salts","Sugar","Fat","Hair"],why:"Calcium salts (like calcium oxalate) can crystallise, especially if you don't drink enough water."},
+  {q:"Why is feces (poop) brown?",o:["Pigments that come from bile","Chlorophyll from vegetables","Red blood cells","Sweat"],why:"Bile pigments are changed by gut bacteria into brown pigments (stercobilin)."},
+  {q:"Which organ belongs to BOTH the respiratory system and the excretory system?",o:["Lungs","Kidneys","Liver","Skin"],why:"The lungs breathe in oxygen AND excrete carbon dioxide and water vapour."}
+ ],
+ fun:[
+  "Your kidneys filter about 180 litres of fluid every day — but you only pee about 1.5 litres of it! 🫘",
+  "Fresh sweat has almost no smell. The smell comes from bacteria on your skin! 🦠",
+  "Your liver can regrow itself, even if part of it is removed! 🟤",
+  "A red blood cell lives about 120 days before it's recycled. ♻️",
+  "Spread out flat, your alveoli would cover roughly the floor of a classroom! 🫁",
+  "You have about 2–4 million sweat glands! 💦",
+  "Poop is brown because of pigments that come from bile! 💩",
+  "Each kidney has about one million nephrons! 🔬",
+  "Drinking enough water helps your kidneys and helps prevent kidney stones! 💧",
+  "The liver changes toxic ammonia into much safer urea. 🧪",
+  "Your skin sheds dead cells all the time — much of household dust is old skin! 🧹"
+ ],
+ sort:[
+  {e:'🔴',n:'Red blood cells',a:0,why:"Too big to pass through the glomerulus filter — they stay in the blood."},
+  {e:'🧬',n:'Blood proteins',a:0,why:"Proteins are too large to be filtered. Protein in urine (albuminuria) can be a sign of kidney damage."},
+  {e:'🩹',n:'Platelets',a:0,why:"Platelets are cell fragments — too big to be filtered, so they stay in the blood."},
+  {e:'🍬',n:'Glucose',a:1,why:"Glucose is filtered, then fully reabsorbed in the proximal tubule. Glucose in urine is a sign of diabetes."},
+  {e:'🥚',n:'Amino acids',a:1,why:"Amino acids are useful — they're filtered, then reabsorbed back into the blood."},
+  {e:'💧',n:'Most of the water',a:1,why:"About 99% of the filtered water is reabsorbed! Only the extra water leaves in urine."},
+  {e:'⚗️',n:'Urea',a:2,why:"Urea is the main waste in urine. It was made by the liver from ammonia."},
+  {e:'🧂',n:'Excess salt',a:2,why:"Your body keeps the salt it needs; the extra leaves in urine."},
+  {e:'💎',n:'Uric acid',a:2,why:"Uric acid is a waste product — it leaves in urine. Too much can form crystals!"},
+  {e:'☣️',n:'Ammonia & H⁺ ions',a:2,why:"These are added to the urine in the distal tubule during augmentation."}
+ ],
+ bins:['🩸 Stays in the blood<br><small>(not filtered)</small>','🔁 Filtered, then<br>reabsorbed','🚽 Leaves in<br>urine'],
+ seqs:[
+  {title:"Put the 3 stages of urine formation in order:", items:['Filtration (glomerulus)','Reabsorption (proximal tubule)','Augmentation (distal tubule)']},
+  {title:"Now trace urine's journey out of the body:", items:['Kidney','Ureter','Urinary bladder','Urethra']}
+ ],
+ pairs:[
+  ['Hemoglobin of old red blood cells','Broken down into bile pigments'],
+  ['Ammonia (toxic)','Turned into urea'],
+  ['Bile','Breaks fat into tiny droplets'],
+  ['Gallbladder','Stores bile'],
+  ['Extra glucose','Stored as glycogen'],
+  ['Bile pigments','Make feces brown']
+ ],
+ prompts:{
+  sweat:'Tap the coiled gland that makes SWEAT 💦', pore:'Where does sweat come out? Tap the PORE 🕳️',
+  epidermis:'Tap the EPIDERMIS — the protective outer layer 🛡️', dermis:'Tap the DERMIS — the thick middle layer 🧱',
+  oil:'Tap the SEBACEOUS (oil) gland that keeps skin soft 🧴', vessels:'Tap the BLOOD VESSELS that widen to release heat 🔥',
+  hypo:'Tap the FAT layer (hypodermis) that keeps you warm 🧈', hair:'Tap the HAIR and its follicle 💇',
+  nerve:'Tap the NERVE that senses heat, cold and touch ⚡'
+ }
+},
+/* ------------------------------ BAHASA INDONESIA ------------------------------ */
+id:{
+ ui:{
+  footer:"ExcretionQuest · Biologi SMP · Paru-paru · Kulit · Ginjal · Hati",
+  sub:"Petualangan Bersih-Bersih Bubble di Sistem Ekskresi",
+  desc:"Jelajahi <b>paru-paru, kulit, ginjal, dan hati</b>. Pelajari bagian-bagiannya, mainkan mini-game, jawab kuis, lalu taklukkan <b>Duel Ekskresi</b> untuk mendapatkan sertifikatmu!",
+  namePh:"Ketik namamu…", start:"Ayo mulai! 🐾",
+  hi:n=>`Halo <b>${n}</b>! Aku <b>Bubble</b> 🐾. Tubuhmu menghasilkan zat sisa sepanjang hari — dan empat organ bekerja keras untuk membuangnya. Pilih organ yang ingin kamu jelajahi!`,
+  dyk:"Tahukah kamu?",
+  whatEx:"🧠 Apa itu ekskresi?",
+  whatExBody:"Ekskresi adalah proses pengeluaran <b>zat sisa metabolisme</b> — zat sisa yang dihasilkan sel-sel tubuh — seperti CO₂, urea, dan garam berlebih. (Membuang sisa makanan yang tidak tercerna berupa feses disebut <i>egesti</i>, bukan ekskresi!)",
+  excretes:"Mengeluarkan:", mastered:"🏅 Dikuasai",
+  bossT:"Duel Ekskresi", bossD:"12 soal kuis berwaktu dari SEMUA organ. Jawab benar berturut-turut untuk bonus poin!",
+  bossTip:"Tips: kuasai keempat organ dulu agar skormu tinggi.", best:"Terbaik", pts:"poin",
+  rule:"Tiap organ: ⭐ Pelajari semua bagian · ⭐ Menangkan mini-game · ⭐ Skor 4/5 di kuis",
+  change:"✏️ Ganti pemain", reset:"🔄 Ulang dari awal", resetSure:"⚠️ Ketuk lagi untuk mengulang",
+  map:"← Peta", mapBtn:"🗺️ Peta", learn:"📖 Belajar", play:"🎮 Mini-game", trivia:"❓ Kuis",
+  where:"📍 Di mana letaknya?", wasteQ:"🗑️ Apa yang dikeluarkan?", how:"⚙️ Bagaimana cara kerjanya?",
+  explored:(a,b)=>`Sudah dijelajahi ${a}/${b} bagian`, tapT:"👆 Ketuk satu bagian!", tapB:"Ketuk bagian mana pun pada gambar, atau label di atas, untuk mengetahui fungsinya.",
+  tapView:"Jelajahi gambar ini juga.",
+  learnDone:n=>`Guk-guk hebat! Kamu sudah menjelajahi semua bagian ${n}! ⭐ Bintang Belajar didapat. Siap main mini-game?`,
+  toPlay:"🎮 Main mini-game →", again:"🔁 Main lagi", toQuiz:"❓ Lanjut ke Kuis →",
+  gameStar:"⭐ Bintang Mini-game didapat!", tryAgain:"Coba lagi — kamu pasti bisa! 🐾",
+  question:"Soal", streak:"Beruntun", next:"Soal berikutnya →", results:"Lihat hasil →",
+  thinkT:['Cepat! Pikir cepat! ⚡','Kamu pasti bisa! 🐾','Jawab benar berturut-turut dapat bonus! 🔥'],
+  think:['Pikirkan baik-baik… 🤔','Santai saja! 🐾','Aku percaya padamu!'],
+  good:['Guk! Benar! 🐾','Hebat sekali!','Kamu ilmuwan sejati! 🔬','Ekor Bubble sampai bergoyang!'],
+  bad:['Ups! Ayo belajar dari sini.','Hampir! Baca penjelasannya di bawah. 🐾'],
+  timeUp:'⏰ Waktu habis! Ini jawabannya:', streakBonus:'(🔥 bonus beruntun!)',
+  quizIntro:n=>`<b>Kuis ${n}!</b> 5 soal. Dapatkan skor <b>4 atau 5</b> untuk meraih bintang Kuis. Siap?`,
+  quizStart:"Mulai kuis ❓",
+  quizPass:(c,first)=>`Skormu <b>${c}/5</b>! ${first?'⭐ Bintang Kuis didapat!':''}`,
+  quizMaster:n=>`🏅 Kamu sudah MENGUASAI ${n}!`,
+  quizFail:c=>`Skormu <b>${c}/5</b>. Kamu perlu 4 untuk mendapat bintang — coba lagi!`,
+  tryQ:"🔁 Coba lagi", review:"📖 Ulas materi", nextOrg:n=>`Berikutnya: ${n} →`, toBoss:"🏆 Duel Ekskresi →",
+  lgIntro:"<b>Ekspres Embusan!</b> Molekul-molekul melayang di dalam alveolus. Ketuk <b>zat sisa</b> — CO₂ dan H₂O — untuk mengembuskannya. Jangan ketuk O₂, sel-selmu membutuhkannya! Raih <b>120+</b> poin dalam 30 detik untuk menang.",
+  lgLeg:["CO₂ zat sisa +10","Uap air H₂O +10","O₂ simpan! −15"], score:"Skor", ready:"Bersiap mengembuskan napas!", startL:"Mulai! 💨",
+  keepO2:"−15 Simpan O₂!",
+  lgWin:s=>`Napas yang hebat! Skormu <b>${s}</b>.`, lgLose:s=>`Skormu <b>${s}</b> — kamu perlu 120.`,
+  lgDetail:"Ingat: CO₂ dan uap air dikeluarkan oleh paru-paru. O₂ justru sebaliknya — MASUK ke dalam darah!",
+  sgIntro:"<b>Pencari Keringat!</b> Aku akan menyebutkan satu bagian kulit — temukan bagian itu pada gambar. Menang jika salahmu <b>3 kali atau kurang</b>!",
+  part:"Bagian", mistakes:"Salah", sgGood:['Guk! Benar! 🐾','Hebat sekali!','Tepat sekali!','Kamu paham kulit!'],
+  sgWrong:n=>`Ups — itu <b>${n}</b>. Coba lagi!`,
+  sgWin:m=>`Ahli kulit! Hanya <b>${m}</b> kali salah.`, sgLose:m=>`Kamu salah <b>${m}</b> kali.`,
+  sgDetail:"Kelenjar keringat (dermis) → saluran → pori-pori → keringat menguap → tubuh menjadi sejuk!",
+  kgIntro:"<b>Pabrik Penyaring Nefron!</b> Tentukan apa yang terjadi pada setiap zat di ginjal. Jawab benar <b>7 dari 10</b>, lalu selesaikan teka-teki urutan!",
+  item:"Zat", whatHappens:"Apa yang terjadi padanya?", kgGood:['Guk! Benar! 🐾','Penyaringan yang hebat!','Nefronmu pasti bangga!'], kgBad:'Belum tepat — baca penjelasannya di bawah!',
+  nextBtn:"Lanjut →", toPuzzle:"Teka-teki urutan →",
+  puzzle:(s,t)=>`<b>Teka-teki urutan ${s}/2:</b> ${t} Ketuk sesuai urutan yang benar!`, buildHint:"Ketuk di bawah untuk menyusun urutan…",
+  perfect:"Urutan sempurna! 🐾", notYet:"Hmm, belum yang itu. Pikirkan: apa yang terjadi <b>pertama</b>?",
+  kgWin:c=>`Master penyaring! Kamu benar <b>${c}/10</b>.`, kgLose:c=>`Kamu benar <b>${c}/10</b> — kamu perlu 7.`,
+  kgDetail:m=>`Kesalahan teka-teki urutan: ${m}. Ingat: zat besar tetap di darah, zat berguna diserap kembali, zat sisa keluar bersama urine!`,
+  mgIntro:"<b>Cocokkan di Lab Hati!</b> Buka dua kartu untuk mencocokkan zat di hati (ungu) dengan apa yang terjadi padanya (kuning). Cocokkan 6 pasang dalam <b>16 langkah atau kurang</b> untuk menang!",
+  moves:"Langkah", pairs:"Pasangan", match:(a,b)=>`Cocok! <b>${a}</b> → ${b}. 🐾`, noPair:"Bukan pasangan — ingat posisinya!",
+  mgWin:m=>`Ingatan yang luar biasa! Semua pasangan dalam <b>${m}</b> langkah.`, mgLose:m=>`Semua pasangan ditemukan dalam <b>${m}</b> langkah — usahakan 16 atau kurang.`,
+  mgDetail:"Hati: merombak sel darah merah tua → zat warna empedu, mengubah amonia → urea, membuat empedu, dan menyimpan glikogen.",
+  sdIntro:"Ini tantangan BESAR! <b>12 soal</b> dari keempat organ, <b>15 detik</b> per soal. Makin cepat menjawab = makin banyak poin, dan 3 jawaban benar berturut-turut memberi 🔥 bonus. Selesaikan untuk mendapat sertifikat!",
+  sdGo:"Aku siap! 🚀",
+  certT:"Sertifikat Penghargaan", certs:"Sertifikat ini diberikan kepada", certDid:"yang telah menyelesaikan <b>Duel Ekskresi ExcretionQuest</b> dan meraih gelar",
+  points:"poin", correct:"benar", bestStreak:"Beruntun terbaik", orgStars:"Bintang organ", signed:"Tertanda: Bubble si Maltese 🐾",
+  print:"🖨️ Cetak / Simpan PDF", sdAgain:"🔁 Main Duel lagi", shot:"📸 Ambil tangkapan layar untuk membagikan sertifikatmu!",
+  ranks:['Ahli Ekskresi','Juara Bersih-Bersih','Ilmuwan Muda','Kadet Penasaran'],
+  locale:'id-ID'
+ },
+ svg:{zoom:"perbesaran ×1000", bloodIn:"darah masuk", bloodOut:"darah keluar", toBladder:"urine ↓ ke kandung kemih", cortex:"KORTEKS", medulla:"MEDULA", urine:"urine", bileOut:"empedu → usus", fromGut:"darah dari usus"},
+ organs:{
+  lungs:{ name:'Paru-paru', waste:'CO₂ + uap air',
+   hello:"Selamat datang di Paru-paru! Setiap kali kamu mengembuskan napas, kamu sedang mengeluarkan zat sisa. Ketuk setiap bagian untuk menjelajah. 🫁",
+   where:"Di rongga dada, dilindungi tulang rusuk dan dibungkus selaput tipis yang disebut <b>pleura</b>.",
+   wasteL:"<b>Karbon dioksida (CO₂)</b> dan <b>uap air (H₂O)</b> — dihasilkan sel-selmu saat respirasi.",
+   how:["Sel: glukosa + O₂ → CO₂ + H₂O + energi","Darah membawa CO₂ ke paru-paru","CO₂ berdifusi dari kapiler ke alveolus","Kamu mengembuskannya! 💨"],
+   views:[{name:'Paru-paru', parts:{
+    trachea:["Trakea (batang tenggorok)","Saluran yang tetap terbuka karena cincin tulang rawan berbentuk huruf C. Udara yang mengandung CO₂ dan uap air keluar dari tubuh melalui saluran ini saat kamu mengembuskan napas."],
+    bronchi:["Bronkus","Trakea bercabang menjadi dua bronkus — masing-masing menuju satu paru-paru."],
+    bronchioles:["Bronkiolus","Cabang-cabang saluran yang makin kecil, seperti pohon terbalik, yang membawa udara ke alveolus."],
+    alveoli:["Alveolus","Ratusan juta kantong udara kecil yang dibungkus kapiler darah. Di sini CO₂ <b>berdifusi</b> keluar dari darah ke udara (dari konsentrasi tinggi → rendah), sedangkan O₂ berdifusi masuk."],
+    rightlung:["Paru-paru kanan","Memiliki <b>3 lobus</b>. Di gambar letaknya di sebelah KIRI-mu karena kita melihat tubuh dari depan!"],
+    leftlung:["Paru-paru kiri","Hanya memiliki <b>2 lobus</b> dan sedikit lebih kecil, memberi ruang untuk jantung. ❤️"],
+    diaphragm:["Diafragma","Otot berbentuk kubah di bawah paru-paru. Saat diafragma melemas dan naik, rongga dada mengecil dan udara kaya CO₂ terdorong keluar (ekspirasi)."]
+   }}]},
+  skin:{ name:'Kulit', waste:'Keringat',
+   hello:"Ini Kulit — organ TERBESAR di tubuhmu! Kulit mengeluarkan keringat dan menjaga tubuhmu tetap sejuk. Ketuk setiap bagian! 💦",
+   where:"Menutupi seluruh tubuh — sekitar <b>2 m²</b> pada orang dewasa. Kulit adalah <b>organ terbesar</b> tubuh manusia.",
+   wasteL:"<b>Keringat</b> — sebagian besar air, ditambah garam (NaCl) dan sedikit <b>urea</b>.",
+   how:["Tubuh kepanasan 🔥","Hipotalamus (di otak) mengirim sinyal","Kelenjar keringat mengambil air, garam & urea dari darah","Keringat keluar lewat pori-pori dan menguap → tubuh menjadi sejuk ❄️"],
+   views:[{name:'Kulit', parts:{
+    epidermis:["Epidermis (kulit ari)","Lapisan luar yang tipis. Bagian atasnya (lapisan tanduk/stratum korneum) berupa sel mati yang terus mengelupas. Bagian dasarnya (lapisan Malpighi/stratum germinativum) membentuk sel baru dan pigmen <b>melanin</b>."],
+    dermis:["Dermis (kulit jangat)","Lapisan tengah yang tebal — tempat kelenjar keringat, kelenjar minyak, akar rambut, pembuluh darah, dan saraf."],
+    hypo:["Hipodermis (jaringan lemak)","Jaringan lemak di bawah dermis. Berfungsi menyimpan cadangan energi, melindungi tubuh dari benturan, dan menjaga tubuh tetap hangat."],
+    sweat:["Kelenjar keringat","Saluran bergulung di dermis yang mengambil air, garam, dan sedikit urea dari darah untuk membentuk <b>keringat</b>."],
+    pore:["Pori-pori","Lubang kecil tempat keringat keluar dari kulit. Saat keringat menguap, panas tubuh ikut terbawa."],
+    oil:["Kelenjar minyak (sebasea)","Menghasilkan <b>sebum</b>, minyak yang membuat rambut dan kulit lembut serta tahan air. Kelenjar minyak yang tersumbat dapat menyebabkan jerawat!"],
+    hair:["Rambut & folikel","Rambut tumbuh dari folikel. Otot-otot kecil menegakkan rambut saat kamu kedinginan — merinding!"],
+    vessels:["Pembuluh darah","Saat kepanasan, pembuluh darah melebar (vasodilatasi) sehingga lebih banyak panas keluar lewat kulit. Saat kedinginan, pembuluh menyempit."],
+    nerve:["Ujung saraf","Merasakan sentuhan, tekanan, nyeri, panas, dan dingin — lalu melaporkannya ke otak."]
+   }}]},
+  kidneys:{ name:'Ginjal', waste:'Urine',
+   hello:"Ginjal adalah pabrik pembersih air di tubuhmu! Jelajahi ginjal, lalu pindah ke tampilan Nefron. 🫘",
+   where:"Sepasang organ berbentuk seperti kacang merah di rongga perut bagian belakang, di kiri dan kanan tulang belakang — masing-masing kira-kira sebesar kepalan tanganmu.",
+   wasteL:"<b>Urine</b> — air, <b>urea</b>, asam urat, garam, dan amonia.",
+   how:["<b>Filtrasi</b> di glomerulus → urine primer","<b>Reabsorpsi</b> di tubulus kontortus proksimal → urine sekunder","<b>Augmentasi</b> di tubulus kontortus distal → urine sesungguhnya","Ginjal → ureter → kandung kemih → uretra 🚽"],
+   views:[
+    {name:'Ginjal', parts:{
+     cortex:["Korteks","Lapisan luar ginjal. Di sini terdapat glomerulus dan kapsul Bowman — tempat penyaringan darah dimulai."],
+     medulla:["Medula (piramida ginjal)","Bagian dalam ginjal, berupa piramida-piramida yang penuh dengan saluran (lengkung Henle dan tubulus pengumpul)."],
+     pelvis:["Pelvis (rongga ginjal)","Rongga berbentuk corong yang menampung urine dari tubulus pengumpul lalu mengalirkannya ke ureter."],
+     ureter:["Ureter","Saluran yang membawa urine ke kandung kemih. Perjalanannya: ginjal → ureter → kandung kemih → uretra → keluar!"],
+     artery:["Arteri renalis","Membawa darah 'kotor' yang mengandung zat sisa seperti urea masuk ke ginjal."],
+     vein:["Vena renalis","Membawa darah yang sudah bersih keluar dari ginjal, kembali menuju jantung."]
+    }},
+    {name:'Nefron', parts:{
+     glomerulus:["Glomerulus","Gulungan kapiler darah yang sangat kecil. Tekanan darah mendorong air, glukosa, garam, asam amino, dan urea keluar: <b>1️⃣ FILTRASI</b>. Sel darah dan protein terlalu besar sehingga tetap di dalam darah. Cairan hasilnya disebut <b>urine primer</b>."],
+     capsule:["Kapsul Bowman","Mangkuk yang membungkus glomerulus dan menampung hasil saringan (urine primer)."],
+     pct:["Tubulus kontortus proksimal","<b>2️⃣ REABSORPSI</b>: zat yang masih berguna — glukosa, asam amino, sebagian besar air, dan sebagian garam — diserap kembali ke darah. Sisanya disebut <b>urine sekunder</b>, kaya akan urea."],
+     loop:["Lengkung Henle","Saluran berbentuk huruf U yang masuk ke medula dan membantu menyerap kembali air, sehingga urine menjadi lebih pekat."],
+     dct:["Tubulus kontortus distal","<b>3️⃣ AUGMENTASI</b>: zat sisa tambahan (seperti ion H⁺, amonia, dan urea) ditambahkan. Sekarang menjadi urine sesungguhnya!"],
+     duct:["Tubulus pengumpul","Mengumpulkan urine dari banyak nefron dan mengalirkannya ke pelvis ginjal."]
+    }}]},
+  liver:{ name:'Hati', waste:'Empedu (+ membuat urea)',
+   hello:"Kenalan dengan Hati — pabrik kimia tubuh dan organ DALAM terbesar. Ketuk setiap bagian! 🧪",
+   where:"Di rongga perut kanan atas, tepat di bawah diafragma. Hati adalah <b>organ dalam terbesar</b> (sekitar 1,5 kg).",
+   wasteL:"<b>Empedu</b>, yang mengandung zat warna empedu (<b>bilirubin</b> & <b>biliverdin</b>). Hati juga mengubah amonia yang beracun menjadi <b>urea</b>.",
+   how:["Sel darah merah tua (umur ±120 hari) dirombak","Hemoglobin → zat warna empedu → empedu","Empedu masuk ke usus dan memberi warna cokelat pada feses","Amonia → urea → darah → ginjal → urine"],
+   views:[{name:'Hati', parts:{
+    rightlobe:["Lobus kanan","Bagian hati yang paling besar. Sel-sel hati di sini merombak hemoglobin dari sel darah merah tua dan mengubah amonia menjadi urea."],
+    leftlobe:["Lobus kiri","Lebih kecil, memanjang ke arah lambung. Sel-sel hatinya sama rajinnya! Hati juga menyimpan glukosa sebagai <b>glikogen</b> dan menetralkan racun."],
+    gallbladder:["Kantong empedu","Kantong kecil berwarna hijau di bawah hati yang menyimpan dan memekatkan empedu sampai kamu makan makanan berlemak."],
+    bileduct:["Saluran empedu","Mengalirkan empedu dari hati dan kantong empedu ke usus dua belas jari, tempat empedu memecah lemak menjadi butiran kecil (emulsi)."],
+    portal:["Vena porta hepatika","Membawa darah dari usus — penuh sari makanan (dan kadang racun) — ke hati untuk diolah."]
+   }}]}
+ },
+ quiz:{
+  lungs:[
+   {q:"Zat sisa apa yang dikeluarkan oleh paru-paru?",o:["Karbon dioksida dan uap air","Oksigen dan nitrogen","Urea dan garam","Zat warna empedu"],why:"CO₂ dan H₂O adalah hasil samping respirasi sel: glukosa + O₂ → CO₂ + H₂O + energi."},
+   {q:"Di bagian mana pertukaran gas terjadi?",o:["Alveolus","Trakea","Bronkus","Diafragma"],why:"Alveolus adalah kantong udara kecil berdinding sangat tipis yang dibungkus kapiler — sangat cocok untuk difusi."},
+   {q:"Berapa jumlah lobus paru-paru KANAN?",o:["3","2","1","4"],why:"Paru-paru kanan = 3 lobus, paru-paru kiri = 2 lobus (memberi ruang untuk jantung)."},
+   {q:"Kamu meniup air kapur dengan sedotan dan air kapur menjadi keruh. Gas apa yang terbukti kamu embuskan?",o:["Karbon dioksida","Oksigen","Nitrogen","Hidrogen"],why:"CO₂ bereaksi dengan air kapur (kalsium hidroksida) membentuk kalsium karbonat yang membuatnya keruh."},
+   {q:"Bagaimana CO₂ berpindah dari darah ke alveolus?",o:["Melalui difusi, dari konsentrasi tinggi ke rendah","Dipompa oleh lambung","Melalui osmosis air","Dibawa oleh empedu"],why:"Kadar CO₂ di darah lebih tinggi daripada di alveolus, sehingga CO₂ berdifusi ke kantong udara."}
+  ],
+  skin:[
+   {q:"Apa zat ekskresi utama yang dikeluarkan kulit?",o:["Keringat","Urine","Empedu","Oksigen"],why:"Kelenjar keringat di kulit mengeluarkan keringat."},
+   {q:"Keringat terutama terdiri atas…",o:["Air, garam, dan sedikit urea","Darah dan protein","Glukosa dan lemak","Zat warna empedu"],why:"Keringat sekitar 99% air, ditambah garam seperti NaCl dan sedikit urea."},
+   {q:"Di lapisan kulit mana kelenjar keringat berada?",o:["Dermis","Epidermis","Batang rambut","Lapisan tanduk"],why:"Kelenjar keringat bergulung di dermis, dengan saluran yang menuju pori-pori."},
+   {q:"Mengapa kita lebih banyak berkeringat saat cuaca panas?",o:["Keringat yang menguap mendinginkan tubuh","Agar kulit mengilap","Untuk mengeluarkan oksigen berlebih","Agar rambut tumbuh lebih banyak"],why:"Penguapan membawa panas dari kulit, sehingga suhu tubuh tetap sekitar 37 °C."},
+   {q:"Bagian terluar epidermis yang tersusun atas sel-sel mati disebut…",o:["Lapisan tanduk (stratum korneum)","Lapisan Malpighi (stratum germinativum)","Hipodermis","Kelenjar minyak"],why:"Lapisan tanduk tersusun atas sel mati yang melindungi tubuh dan terus mengelupas."}
+  ],
+  kidneys:[
+   {q:"Apa nama unit penyaring terkecil di dalam ginjal?",o:["Nefron","Alveolus","Neuron","Vili"],why:"Setiap ginjal memiliki sekitar satu juta nefron!"},
+   {q:"Tahap PERTAMA pembentukan urine yang terjadi di glomerulus adalah…",o:["Filtrasi","Reabsorpsi","Augmentasi","Pencernaan"],why:"Filtrasi terjadi pertama kali dan menghasilkan urine primer."},
+   {q:"Zat apa yang TIDAK boleh ada dalam urine orang sehat?",o:["Glukosa","Air","Urea","Garam"],why:"Glukosa diserap kembali seluruhnya. Glukosa dalam urine (glukosuria) bisa menjadi tanda diabetes melitus."},
+   {q:"Urutan jalannya urine keluar dari tubuh yang benar adalah…",o:["Ginjal → ureter → kandung kemih → uretra","Ginjal → uretra → kandung kemih → ureter","Kandung kemih → ginjal → ureter → uretra","Ureter → ginjal → uretra → kandung kemih"],why:"Ureter membawa urine ke kandung kemih; uretra mengeluarkannya dari tubuh."},
+   {q:"Apa yang memberi warna kuning pada urine?",o:["Urokrom, dari perombakan zat warna empedu","Glukosa","Sel darah merah","Klorofil"],why:"Urokrom berasal dari perombakan zat warna empedu — penghubung antara hati dan ginjal!"}
+  ],
+  liver:[
+   {q:"Zat apa yang dikeluarkan oleh hati?",o:["Empedu","Keringat","Urine","Karbon dioksida"],why:"Hati membuat empedu yang membawa zat warna empedu keluar dari tubuh melalui usus."},
+   {q:"Zat warna empedu (bilirubin dan biliverdin) berasal dari…",o:["Hemoglobin sel darah merah tua","Lemak yang dicerna","Udara yang kita hirup","Tulang kita"],why:"Sel darah merah hidup sekitar 120 hari. Setelah itu hemoglobinnya dirombak menjadi zat warna empedu."},
+   {q:"Hati mengubah amonia yang beracun menjadi…",o:["Urea","Glukosa","Oksigen","Garam empedu"],why:"Amonia berasal dari pemecahan asam amino. Urea jauh kurang beracun dan dikeluarkan oleh ginjal."},
+   {q:"Di mana empedu disimpan?",o:["Kantong empedu","Kandung kemih","Lambung","Pankreas"],why:"Kantong empedu menyimpan empedu dan mengeluarkannya ke usus dua belas jari saat kamu makan makanan berlemak."},
+   {q:"Jika hati tidak dapat mengolah bilirubin dengan baik, kulit dan mata menjadi kuning. Kelainan ini disebut…",o:["Penyakit kuning (ikterus)","Jerawat","Asma","Batu ginjal"],why:"Penyakit kuning terjadi saat bilirubin menumpuk di darah — sering menjadi tanda gangguan hati seperti hepatitis."}
+  ]
+ },
+ extra:[
+  {q:"Apa organ TERBESAR di tubuh manusia?",o:["Kulit","Hati","Paru-paru","Usus"],why:"Kulit! Hati adalah organ DALAM terbesar."},
+  {q:"Apa organ DALAM terbesar?",o:["Hati","Ginjal","Jantung","Lambung"],why:"Hati orang dewasa beratnya sekitar 1,5 kg."},
+  {q:"Berapa lama kira-kira umur sel darah merah?",o:["120 hari","12 hari","2 tahun","10 tahun"],why:"Setelah sekitar 120 hari, sel darah merah tua dirombak di hati dan limpa."},
+  {q:"Bagian otak mana yang mengatur suhu tubuh dan pengeluaran keringat?",o:["Hipotalamus","Otak kecil","Sumsum lanjutan","Otak besar"],why:"Hipotalamus bekerja seperti termostat tubuh."},
+  {q:"Manakah yang BUKAN organ ekskresi?",o:["Lambung","Kulit","Hati","Paru-paru"],why:"Lambung mencerna makanan. Pengeluaran sisa makanan (feses) disebut egesti, bukan ekskresi."},
+  {q:"Urea dalam urinemu pertama kali dibuat di…",o:["Hati","Ginjal","Kandung kemih","Kulit"],why:"Hati membuat urea; ginjal hanya menyaringnya dari darah. Kerja sama tim!"},
+  {q:"Berapa banyak urine yang dihasilkan orang dewasa sehat per hari?",o:["Sekitar 1–2 liter","Sekitar 50 mL","Sekitar 10 liter","Sekitar 180 liter"],why:"Ginjal menyaring sekitar 180 L cairan sehari, tetapi hampir semuanya diserap kembali!"},
+  {q:"Apa arti 'ekskresi'?",o:["Pengeluaran zat sisa metabolisme yang dibuat sel tubuh","Pengeluaran sisa makanan yang tidak tercerna","Menghirup oksigen","Mencerna lemak"],why:"Ekskresi mengeluarkan zat sisa metabolisme (CO₂, urea, keringat…). Pengeluaran sisa makanan disebut egesti."},
+  {q:"Mengembuskan napas ke cermin yang dingin membuat cermin berembun. Ini menunjukkan kita mengembuskan…",o:["Uap air","Oksigen","Empedu","Garam"],why:"Uap air dalam napasmu mengembun menjadi titik-titik air di kaca yang dingin."},
+  {q:"Batu ginjal sebagian besar terbentuk dari…",o:["Garam kalsium","Gula","Lemak","Rambut"],why:"Garam kalsium (misalnya kalsium oksalat) dapat mengkristal, terutama jika kurang minum air."},
+  {q:"Mengapa feses berwarna cokelat?",o:["Karena zat warna yang berasal dari empedu","Karena klorofil dari sayuran","Karena sel darah merah","Karena keringat"],why:"Zat warna empedu diubah oleh bakteri usus menjadi pigmen cokelat (sterkobilin)."},
+  {q:"Organ apa yang termasuk sistem pernapasan SEKALIGUS sistem ekskresi?",o:["Paru-paru","Ginjal","Hati","Kulit"],why:"Paru-paru menghirup oksigen SEKALIGUS mengeluarkan karbon dioksida dan uap air."}
+ ],
+ fun:[
+  "Ginjalmu menyaring sekitar 180 liter cairan setiap hari — tetapi yang menjadi urine hanya sekitar 1,5 liter! 🫘",
+  "Keringat yang baru keluar hampir tidak berbau. Baunya berasal dari bakteri di kulit! 🦠",
+  "Hatimu bisa tumbuh kembali, bahkan jika sebagian diangkat! 🟤",
+  "Sel darah merah hidup sekitar 120 hari sebelum didaur ulang. ♻️",
+  "Jika dibentangkan, alveolus di paru-parumu kira-kira seluas lantai ruang kelas! 🫁",
+  "Kamu memiliki sekitar 2–4 juta kelenjar keringat! 💦",
+  "Feses berwarna cokelat karena zat warna yang berasal dari empedu! 💩",
+  "Setiap ginjal memiliki sekitar satu juta nefron! 🔬",
+  "Cukup minum air membantu kerja ginjal dan mencegah batu ginjal! 💧",
+  "Hati mengubah amonia yang beracun menjadi urea yang jauh lebih aman. 🧪",
+  "Kulitmu terus melepaskan sel mati — banyak debu di rumah sebenarnya sel kulit mati! 🧹"
+ ],
+ sort:[
+  {e:'🔴',n:'Sel darah merah',a:0,why:"Terlalu besar untuk lolos dari saringan glomerulus — tetap di dalam darah."},
+  {e:'🧬',n:'Protein darah',a:0,why:"Protein terlalu besar untuk disaring. Protein dalam urine (albuminuria) dapat menjadi tanda kerusakan ginjal."},
+  {e:'🩹',n:'Keping darah',a:0,why:"Keping darah terlalu besar untuk disaring, jadi tetap di dalam darah."},
+  {e:'🍬',n:'Glukosa',a:1,why:"Glukosa disaring, lalu diserap kembali seluruhnya di tubulus proksimal. Glukosa dalam urine adalah tanda diabetes."},
+  {e:'🥚',n:'Asam amino',a:1,why:"Asam amino masih berguna — disaring, lalu diserap kembali ke darah."},
+  {e:'💧',n:'Sebagian besar air',a:1,why:"Sekitar 99% air hasil saringan diserap kembali! Hanya air berlebih yang keluar bersama urine."},
+  {e:'⚗️',n:'Urea',a:2,why:"Urea adalah zat sisa utama dalam urine. Urea dibuat oleh hati dari amonia."},
+  {e:'🧂',n:'Garam berlebih',a:2,why:"Tubuh menyimpan garam yang dibutuhkan; kelebihannya keluar bersama urine."},
+  {e:'💎',n:'Asam urat',a:2,why:"Asam urat adalah zat sisa yang keluar bersama urine. Jika terlalu banyak, bisa membentuk kristal!"},
+  {e:'☣️',n:'Amonia & ion H⁺',a:2,why:"Zat-zat ini ditambahkan ke urine di tubulus distal saat augmentasi."}
+ ],
+ bins:['🩸 Tetap di darah<br><small>(tidak disaring)</small>','🔁 Disaring, lalu<br>diserap kembali','🚽 Keluar bersama<br>urine'],
+ seqs:[
+  {title:"Urutkan 3 tahap pembentukan urine:", items:['Filtrasi (glomerulus)','Reabsorpsi (tubulus proksimal)','Augmentasi (tubulus distal)']},
+  {title:"Sekarang telusuri perjalanan urine keluar dari tubuh:", items:['Ginjal','Ureter','Kandung kemih','Uretra']}
+ ],
+ pairs:[
+  ['Hemoglobin sel darah merah tua','Dirombak menjadi zat warna empedu'],
+  ['Amonia (beracun)','Diubah menjadi urea'],
+  ['Empedu','Memecah lemak menjadi butiran kecil'],
+  ['Kantong empedu','Menyimpan empedu'],
+  ['Glukosa berlebih','Disimpan sebagai glikogen'],
+  ['Zat warna empedu','Memberi warna cokelat pada feses']
+ ],
+ prompts:{
+  sweat:'Ketuk kelenjar bergulung yang membuat KERINGAT 💦', pore:'Dari mana keringat keluar? Ketuk PORI-PORI 🕳️',
+  epidermis:'Ketuk EPIDERMIS — lapisan pelindung paling luar 🛡️', dermis:'Ketuk DERMIS — lapisan tengah yang tebal 🧱',
+  oil:'Ketuk KELENJAR MINYAK yang membuat kulit lembut 🧴', vessels:'Ketuk PEMBULUH DARAH yang melebar untuk melepas panas 🔥',
+  hypo:'Ketuk LAPISAN LEMAK (hipodermis) yang menjaga tubuh tetap hangat 🧈', hair:'Ketuk RAMBUT dan folikelnya 💇',
+  nerve:'Ketuk SARAF yang merasakan panas, dingin, dan sentuhan ⚡'
+ }
+}
+};
+
+/* ===================== Screens ===================== */
+const app = $('#app');
+let current = null;
+function go(fn, ...args){ clearTimers(); current=[fn,args]; window.scrollTo({top:0}); fn(...args); updateHud(); }
+const O = id => T().organs[id];
+const stars = id => '★'.repeat(starsOf(id))+'☆'.repeat(3-starsOf(id));
+
+function langButtons(){
+  return `<div class="row" style="justify-content:center;margin-bottom:10px">
+    <button class="tab ${S.lang==='en'?'on':''}" data-lang="en">🇬🇧 English</button>
+    <button class="tab ${S.lang==='id'?'on':''}" data-lang="id">🇮🇩 Bahasa Indonesia</button></div>`;
+}
+function setLang(l){ if(S.lang===l) return; S.lang=l; save(); if(current) go(current[0],...current[1]); }
+
+function screenTitle(){
+  const u=T().ui;
+  app.innerHTML = `<div class="card hero">
+    ${langButtons()}
+    <div class="dog" style="display:inline-block;animation:bob 2.6s ease-in-out infinite">${dog(150,'wow')}</div>
+    <h1>Excretion<span style="color:var(--pink)">Quest</span></h1>
+    <div class="sub">${u.sub}</div>
+    <div class="organs-strip">🫁 🖐️ 🫘 🟤</div>
+    <p class="muted" style="max-width:560px;margin:0 auto 14px">${u.desc}</p>
+    <div class="row" style="justify-content:center">
+      <input type="text" id="nm" maxlength="30" placeholder="${u.namePh}" value="${esc(S.name||'')}">
+      <button class="btn pink" id="startb">${u.start}</button>
+    </div>
+  </div>`;
+  $$('[data-lang]').forEach(b=>b.onclick=()=>{ S.name=$('#nm').value.trim()||S.name; setLang(b.dataset.lang); });
+  const start = ()=>{ const v=$('#nm').value.trim(); if(!v){ $('#nm').classList.add('shake'); setTimeout(()=>$('#nm').classList.remove('shake'),400); $('#nm').focus(); return; } S.name=v; save(); sfx.win(); go(screenMap); };
+  $('#startb').onclick = start;
+  $('#nm').onkeydown = e=>{ if(e.key==='Enter') start(); };
+}
+
+function screenMap(){
+  const u=T().ui;
+  const allDone = ORDER.every(id=>starsOf(id)===3);
+  app.innerHTML = `
+  <div class="card">
+    ${guide(`${u.hi(esc(S.name))}<br><br>💡 <i>${u.dyk}</i> ${pick(T().fun)}`,'happy',96)}
+    <div class="fact" style="margin-bottom:14px"><span class="fh">${u.whatEx}</span>${u.whatExBody}</div>
+    <div class="map">
+      ${ORDER.map(id=>{ const s=starsOf(id), o=O(id); return `<button class="zone ${META[id].cls}" data-id="${id}">
+        <div class="stars">${stars(id)}</div>
+        <div class="em">${META[id].emoji}</div><h3>${o.name}</h3>
+        <div class="ex">${u.excretes} ${o.waste}</div>
+        ${s===3?`<div class="badge">${u.mastered}</div>`:''}
+      </button>`;}).join('')}
+    </div>
+    <button class="boss" id="boss"><div class="em">🏆</div><div><h3>${u.bossT}</h3><div>${u.bossD} ${allDone?'':`<br><small>${u.bossTip}</small>`}</div>${S.showdown?`<div style="margin-top:6px;font-weight:800">${u.best}: ${S.showdown} ${u.pts}</div>`:''}</div></button>
+  </div>
+  <div class="row noprint" style="justify-content:center"><span class="muted">${u.rule}</span></div>
+  <div class="row noprint" style="justify-content:center;margin-top:10px">
+    <button class="btn ghost small" id="chg">${u.change}</button>
+    <button class="btn ghost small" id="rst">${u.reset}</button>
+  </div>`;
+  $$('.zone').forEach(z=>z.onclick=()=>{ sfx.click(); go(screenOrgan, z.dataset.id, 'learn'); });
+  $('#boss').onclick = ()=>{ sfx.click(); go(screenShowdown); };
+  $('#chg').onclick = ()=>go(screenTitle);
+  $('#rst').onclick = ()=>{ if(confirmReset()){ const nm=S.name, l=S.lang; S=blank(); S.name=nm; S.lang=l; save(); go(screenMap); } };
+}
+let resetArmed=false;
+function confirmReset(){
+  if(resetArmed){ resetArmed=false; return true; }
+  resetArmed=true; const b=$('#rst'); b.textContent=T().ui.resetSure; setTimeout(()=>{ resetArmed=false; if(b.isConnected) b.textContent=T().ui.reset; },3000);
+  return false;
+}
+
+function screenOrgan(id, tab){
+  const o = O(id), st = S.organs[id], u=T().ui;
+  app.innerHTML = `<div class="card">
+    <div class="row" style="justify-content:space-between">
+      <button class="btn ghost small" id="back">${u.map}</button>
+      <span class="pill">${stars(id)}</span>
+    </div>
+    <h2 style="margin-top:12px">${META[id].emoji} ${o.name}</h2>
+    <div class="tabs">
+      <button class="tab ${tab==='learn'?'on':''}" data-t="learn">${u.learn} ${st.learn?'✅':''}</button>
+      <button class="tab ${tab==='play'?'on':''}" data-t="play">${u.play} ${st.gamePass?'✅':''}</button>
+      <button class="tab ${tab==='quiz'?'on':''}" data-t="quiz">${u.trivia} ${(st.quizBest||0)>=4?'✅':''}</button>
+    </div>
+  </div>
+  <div class="card" id="pane"></div>`;
+  $('#back').onclick = ()=>go(screenMap);
+  $$('.tab[data-t]').forEach(t=>t.onclick=()=>{ sfx.click(); go(screenOrgan,id,t.dataset.t); });
+  const pane = $('#pane');
+  if(tab==='learn') learnPane(pane,id);
+  else if(tab==='play') GAMES[id](pane,id);
+  else quizPane(pane,id);
+}
+
+/* ---------- Learn ---------- */
+function learnPane(el,id){
+  const o=O(id), u=T().ui;
+  const views = o.views.map((v,i)=>({...v, svg:META[id].svgs[i](T().svg), key:'v'+i}));
+  const allParts = views.flatMap(v=>Object.keys(v.parts).map(p=>v.key+':'+p));
+  const seen = new Set();
+  let view = 0;
+  el.innerHTML = `${guide(o.hello,'happy',80,'lg')}
+   <div class="facts">
+     <div class="fact"><span class="fh">${u.where}</span>${o.where}</div>
+     <div class="fact"><span class="fh">${u.wasteQ}</span>${o.wasteL}</div>
+     <div class="fact"><span class="fh">${u.how}</span><ol>${o.how.map(h=>`<li>${h}</li>`).join('')}</ol></div>
+   </div>
+   <div class="learn">
+     <div>
+       ${views.length>1?`<div class="viewsw">${views.map((v,i)=>`<button class="tab ${i===0?'on':''}" data-v="${i}">🔍 ${v.name}</button>`).join('')}</div>`:''}
+       <div class="dia-wrap" id="dia"></div>
+     </div>
+     <div>
+       <div class="progress"><div id="lp"></div></div>
+       <div class="muted" id="lpt" style="font-weight:700"></div>
+       <div class="chips" id="chips"></div>
+       <div class="info" id="info"><h3>${u.tapT}</h3><p>${u.tapB}</p></div>
+     </div>
+   </div>`;
+  function drawView(){
+    const v=views[view];
+    $('#dia',el).innerHTML = v.svg;
+    $('#chips',el).innerHTML = Object.entries(v.parts).map(([k,p])=>`<button class="chip ${seen.has(v.key+':'+k)?'seen':''}" data-p="${k}">${seen.has(v.key+':'+k)?'✓ ':''}${p[0]}</button>`).join('');
+    $$('.part',el).forEach(g=>g.addEventListener('click',()=>select(g.dataset.part)));
+    $$('.chip',el).forEach(c=>c.onclick=()=>select(c.dataset.p));
+    prog();
+  }
+  function prog(){
+    $('#lp',el).style.width=Math.round(seen.size/allParts.length*100)+'%';
+    $('#lpt',el).textContent = u.explored(seen.size, allParts.length);
+  }
+  function select(k){
+    const v=views[view]; const p=v.parts[k]; if(!p) return;
+    sfx.click();
+    $$('.part',el).forEach(g=>g.classList.toggle('active',g.dataset.part===k));
+    const key=v.key+':'+k, isNew=!seen.has(key); seen.add(key);
+    $$('.chip',el).forEach(c=>{ const kk=v.key+':'+c.dataset.p; c.classList.toggle('on',c.dataset.p===k); c.classList.toggle('seen',seen.has(kk)); c.textContent=(seen.has(kk)?'✓ ':'')+v.parts[c.dataset.p][0]; });
+    $('#info',el).innerHTML = `<h3>${p[0]}</h3><p>${p[1]}</p>`;
+    prog();
+    if(isNew && seen.size===allParts.length){
+      const first = !S.organs[id].learn;
+      S.organs[id].learn=true; save(); sfx.win(); if(first) confetti(60);
+      $('#lg',el).innerHTML = u.learnDone(o.name);
+      $('#lg-dog',el).innerHTML = dog(80,'wow');
+      $('#info',el).insertAdjacentHTML('beforeend',`<div class="row" style="margin-top:10px"><button class="btn green" id="toplay">${u.toPlay}</button></div>`);
+      $('#toplay',el).onclick=()=>go(screenOrgan,id,'play');
+    }
+  }
+  $$('.viewsw .tab',el).forEach(b=>b.onclick=()=>{ view=+b.dataset.v; $$('.viewsw .tab',el).forEach(x=>x.classList.toggle('on',x===b)); $('#info',el).innerHTML=`<h3>${u.tapT}</h3><p>${u.tapView}</p>`; drawView(); });
+  drawView();
+}
+
+/* ---------- Generic result ---------- */
+function gameResult(el,id,{pass,title,detail,points}){
+  const st=S.organs[id], u=T().ui;
+  const firstPass = pass && !st.gamePass;
+  if(pass) st.gamePass=true;
+  st.gameBest = Math.max(st.gameBest||0, points||0);
+  save();
+  if(pass){ sfx.win(); confetti(firstPass?90:40); } else sfx.bad();
+  el.innerHTML = `${guide(pass?`${title} ${firstPass?u.gameStar:''}`:`${title} ${u.tryAgain}`, pass?'wow':'sad',90)}
+    <div class="result-big">${pass?'🎉':'💪'}</div>
+    <p class="center" style="font-weight:700">${detail}</p>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" id="again">${u.again}</button>
+      <button class="btn ${pass?'green':''}" id="toquiz">${u.toQuiz}</button>
+    </div>`;
+  $('#again',el).onclick=()=>go(screenOrgan,id,'play');
+  $('#toquiz',el).onclick=()=>go(screenOrgan,id,'quiz');
+}
+
+/* ---------- Lungs game ---------- */
+function gameLungs(el,id){
+  const u=T().ui;
+  el.innerHTML = `${guide(u.lgIntro,'happy',80)}
+   <div class="legend"><span><i style="background:#7b8794"></i>${u.lgLeg[0]}</span><span><i style="background:#4aa3df"></i>${u.lgLeg[1]}</span><span><i style="background:#ef5b5b"></i>${u.lgLeg[2]}</span></div>
+   <div class="row" style="margin-bottom:10px"><span class="pill">⏱ <b id="lt">30</b>s</span><span class="pill">${u.score} <b id="ls">0</b></span><span class="pill">${u.best} ${S.organs[id].gameBest||0}</span></div>
+   <div class="arena" id="arena"><div class="cap"></div><div class="hint" id="hint"><div style="font-size:3rem">🫁</div><div>${u.ready}</div><br><button class="btn pink" id="lgo">${u.startL}</button></div></div>`;
+  const arena=$('#arena',el); let score=0, t=30, running=false;
+  $('#lgo',el).onclick = ()=>{
+    $('#hint',el).remove(); running=true; sfx.click();
+    timers.push(setInterval(spawn, 560));
+    timers.push(setInterval(()=>{ t--; $('#lt',el).textContent=t; if(t<=0) end(); },1000));
+  };
+  function floaty(x,y,txt,col){ const f=document.createElement('div'); f.className='floaty'; f.style.left=x+'px'; f.style.top=y+'px'; f.style.color=col; f.textContent=txt; arena.appendChild(f); setTimeout(()=>f.remove(),800); }
+  function spawn(){
+    if(!running) return;
+    const r=Math.random(), type = r<.42?'co2':(r<.72?'h2o':'o2');
+    const m=document.createElement('div'); m.className='mol '+type;
+    m.textContent = {co2:'CO₂',h2o:'H₂O',o2:'O₂'}[type];
+    m.style.left = Math.random()*(arena.clientWidth-70)+'px';
+    m.style.animationDuration = (3.2+Math.random()*2.2)+'s';
+    m.addEventListener('animationend',()=>{ if(!m.classList.contains('pop')) m.remove(); });
+    m.addEventListener('pointerdown',e=>{
+      e.preventDefault(); if(!running||m.classList.contains('pop')) return;
+      const rect=m.getBoundingClientRect(), ar=arena.getBoundingClientRect(), x=rect.left-ar.left+10, y=rect.top-ar.top;
+      if(type==='o2'){ score=Math.max(0,score-15); sfx.bad(); floaty(x,y,u.keepO2,'#e5484d'); arena.classList.add('shake'); setTimeout(()=>arena.classList.remove('shake'),350); }
+      else { score+=10; sfx.pop(); floaty(x,y,'+10 💨','#1f8a51'); }
+      $('#ls',el).textContent=score;
+      m.style.transform = getComputedStyle(m).transform; m.classList.add('pop'); setTimeout(()=>m.remove(),300);
+    });
+    arena.appendChild(m);
+  }
+  function end(){
+    running=false; clearTimers();
+    const pass=score>=120;
+    gameResult(el,id,{pass,points:Math.min(score,300),title:pass?u.lgWin(score):u.lgLose(score),detail:u.lgDetail});
+  }
+}
+
+/* ---------- Skin game ---------- */
+function gameSkin(el,id){
+  const u=T().ui, P=T().prompts, parts=O('skin').views[0].parts;
+  const prompts = shuffle(Object.keys(P));
+  let i=0, mistakes=0, lock=false;
+  el.innerHTML = `${guide(u.sgIntro,'happy',80,'sg')}
+    <div class="prompt" id="sp"></div>
+    <div class="row" style="margin-bottom:8px"><span class="pill">${u.part} <b id="si">1</b>/${prompts.length}</span><span class="pill">❌ ${u.mistakes} <b id="sm">0</b></span></div>
+    <div class="dia-wrap" style="max-width:620px;margin:0 auto">${SKIN_SVG(T().svg)}</div>`;
+  const showP=()=>{ $('#sp',el).textContent=P[prompts[i]]; $('#si',el).textContent=i+1; };
+  $$('.part',el).forEach(g=>g.addEventListener('click',()=>{
+    if(lock) return;
+    const k=g.dataset.part;
+    if(k===prompts[i]){
+      sfx.good(); g.classList.add('right'); lock=true;
+      $('#sg',el).innerHTML = pick(u.sgGood) + ' ' + parts[k][1];
+      $('#sg-dog',el).innerHTML=dog(80,'wow');
+      timers.push(setTimeout(()=>{ g.classList.remove('right'); lock=false; i++; if(i>=prompts.length) finish(); else showP(); }, 1500));
+    } else {
+      sfx.bad(); mistakes++; $('#sm',el).textContent=mistakes; g.classList.add('wrong');
+      $('#sg',el).innerHTML = u.sgWrong(parts[k][0]);
+      $('#sg-dog',el).innerHTML=dog(80,'sad');
+      timers.push(setTimeout(()=>g.classList.remove('wrong'),700));
+    }
+  }));
+  function finish(){
+    const pass=mistakes<=3;
+    gameResult(el,id,{pass,points:Math.max(0,180-mistakes*20),title:pass?u.sgWin(mistakes):u.sgLose(mistakes),detail:u.sgDetail});
+  }
+  showP();
+}
+
+/* ---------- Kidney game ---------- */
+function gameKidney(el,id){
+  const u=T().ui, items=shuffle(T().sort), BINS=T().bins, SEQS=T().seqs; let i=0, correct=0, seqMistakes=0;
+  function showItem(){
+    const it=items[i];
+    el.innerHTML = `${guide(u.kgIntro,'happy',80,'kg')}
+      <div class="row"><span class="pill">${u.item} ${i+1}/${items.length}</span><span class="pill">✅ ${correct}</span></div>
+      <div class="sortcard"><div class="big">${it.e}</div><h3>${it.n}</h3><div class="muted">${u.whatHappens}</div></div>
+      <div class="bins">${BINS.map((b,k)=>`<button class="bin" data-k="${k}">${b}</button>`).join('')}</div>
+      <div id="kfb"></div>`;
+    $$('.bin',el).forEach(b=>b.onclick=()=>{
+      const k=+b.dataset.k, ok=k===it.a;
+      $$('.bin',el).forEach(x=>{ x.disabled=true; if(+x.dataset.k===it.a) x.classList.add('right'); });
+      if(ok){ correct++; sfx.good(); } else { b.classList.add('wrong'); sfx.bad(); }
+      $('#kg-dog',el).innerHTML=dog(80,ok?'wow':'sad');
+      $('#kg',el).innerHTML= ok?pick(u.kgGood):u.kgBad;
+      $('#kfb',el).innerHTML = `<div class="fb ${ok?'ok':'no'}">${ok?'✅':'❌'} ${it.why}</div><div class="row"><button class="btn" id="knext">${i<items.length-1?u.nextBtn:u.toPuzzle}</button></div>`;
+      $('#knext',el).onclick=()=>{ i++; if(i<items.length) showItem(); else seq(0); };
+    });
+  }
+  function seq(s){
+    const Q=SEQS[s]; let pos=0;
+    el.innerHTML = `${guide(u.puzzle(s+1,Q.title),'happy',80,'kg')}
+      <div class="seqbuilt" id="built"><span class="muted">${u.buildHint}</span></div>
+      <div class="row" id="opts">${shuffle(Q.items).map(t=>`<button class="btn ghost" data-t="${esc(t)}">${t}</button>`).join('')}</div>`;
+    $$('#opts .btn',el).forEach(b=>b.onclick=()=>{
+      if(b.dataset.t===Q.items[pos]){
+        sfx.good(); const built=$('#built',el); if(pos===0) built.innerHTML='';
+        built.insertAdjacentHTML('beforeend',`${pos?'<span class="arrow">→</span>':''}<span class="step">${Q.items[pos]}</span>`);
+        b.remove(); pos++;
+        if(pos===Q.items.length){ $('#kg',el).innerHTML=u.perfect; $('#kg-dog',el).innerHTML=dog(80,'wow'); timers.push(setTimeout(()=>{ if(s===0) seq(1); else finish(); },1300)); }
+      } else { sfx.bad(); seqMistakes++; b.classList.add('shake'); setTimeout(()=>b.classList.remove('shake'),400); $('#kg',el).innerHTML=u.notYet; $('#kg-dog',el).innerHTML=dog(80,'sad'); }
+    });
+  }
+  function finish(){
+    const pass=correct>=7;
+    gameResult(el,id,{pass,points:correct*15+Math.max(0,50-seqMistakes*10),title:pass?u.kgWin(correct):u.kgLose(correct),detail:u.kgDetail(seqMistakes)});
+  }
+  showItem();
+}
+
+/* ---------- Liver game ---------- */
+function gameLiver(el,id){
+  const u=T().ui, PAIRS=T().pairs;
+  const cards = shuffle(PAIRS.flatMap((p,k)=>[{k,t:p[0],kind:'term'},{k,t:p[1],kind:'meaning'}]));
+  let open=[], matched=0, moves=0, lock=false;
+  el.innerHTML = `${guide(u.mgIntro,'happy',80,'mg')}
+    <div class="row" style="margin-bottom:10px"><span class="pill">${u.moves} <b id="mv">0</b></span><span class="pill">${u.pairs} <b id="pr">0</b>/6</span></div>
+    <div class="mem">${cards.map((c,i)=>`<button class="mcard" data-i="${i}"><span class="back">🐾</span></button>`).join('')}</div>`;
+  $$('.mcard',el).forEach(b=>b.onclick=()=>{
+    const c=cards[+b.dataset.i];
+    if(lock||b.classList.contains('up')||b.classList.contains('done')) return;
+    sfx.click(); b.classList.add('up',c.kind); b.innerHTML=(c.kind==='term'?'🟣 ':'🟡 ')+c.t; open.push(b);
+    if(open.length===2){
+      moves++; $('#mv',el).textContent=moves;
+      const [a,b2]=open, ca=cards[+a.dataset.i], cb=cards[+b2.dataset.i];
+      if(ca.k===cb.k && ca.kind!==cb.kind){
+        sfx.good(); a.classList.add('done'); b2.classList.add('done'); open=[]; matched++; $('#pr',el).textContent=matched;
+        $('#mg',el).innerHTML=u.match(PAIRS[ca.k][0],PAIRS[ca.k][1]); $('#mg-dog',el).innerHTML=dog(80,'wow');
+        if(matched===6) timers.push(setTimeout(finish,900));
+      } else {
+        lock=true; sfx.bad(); $('#mg-dog',el).innerHTML=dog(80,'sad'); $('#mg',el).innerHTML=u.noPair;
+        timers.push(setTimeout(()=>{ [a,b2].forEach(x=>{ x.classList.remove('up','term','meaning'); x.innerHTML='<span class="back">🐾</span>'; }); open=[]; lock=false; },1100));
+      }
+    }
+  });
+  function finish(){
+    const pass=moves<=16;
+    gameResult(el,id,{pass,points:Math.max(40,200-moves*8),title:pass?u.mgWin(moves):u.mgLose(moves),detail:u.mgDetail});
+  }
+}
+const GAMES = {lungs:gameLungs, skin:gameSkin, kidneys:gameKidney, liver:gameLiver};
+
+/* ---------- Quiz engine (correct answer is always o[0] in the data; options are shuffled) ---------- */
+function runQuiz(el, qs, opts){
+  const u=T().ui; let i=0, correct=0, points=0, streak=0, best=0;
+  const TT=15;
+  function show(){
+    const q=qs[i]; const choices=shuffle(q.o.map((t,k)=>({t,ok:k===0})));
+    el.innerHTML = `<div class="qhead"><span class="pill">${u.question} ${i+1}/${qs.length}</span>${opts.timed?`<span class="pill">🔥 ${u.streak} ${streak}</span><span class="pill">⭐ ${points} ${u.pts}</span>`:`<span class="pill">✅ ${correct}</span>`}</div>
+      ${opts.timed?'<div class="tbar"><div id="tf"></div></div>':''}
+      ${guide(pick(opts.timed?u.thinkT:u.think),'happy',72,'qg')}
+      <h3 class="qtext">${q.q}</h3>
+      <div class="opts">${choices.map((c,k)=>`<button class="opt" data-k="${k}">${'ABCD'[k]}. ${c.t}</button>`).join('')}</div>
+      <div id="qfb"></div>`;
+    let done=false; const t0=Date.now();
+    const answer=(k)=>{
+      if(done) return; done=true; clearTimers();
+      const left=Math.max(0,TT-(Date.now()-t0)/1000);
+      const ok = k>=0 && choices[k].ok;
+      $$('.opt',el).forEach((b,j)=>{ b.disabled=true; if(choices[j].ok) b.classList.add('right'); else if(j===k) b.classList.add('wrong'); });
+      let gained=0;
+      if(ok){ correct++; streak++; best=Math.max(best,streak); if(opts.timed){ gained=100+Math.round(left*5)+(streak>=3?50:0); points+=gained; } sfx.good(); }
+      else { streak=0; sfx.bad(); }
+      $('#qg-dog',el).innerHTML=dog(72,ok?'wow':'sad');
+      $('#qg',el).innerHTML = ok ? pick(u.good)+(opts.timed?` +${gained} ${streak>=3?u.streakBonus:''}`:'') : (k<0?u.timeUp:pick(u.bad));
+      $('#qfb',el).innerHTML = `<div class="fb ${ok?'ok':'no'}">💡 ${q.why}</div><div class="row"><button class="btn" id="qn">${i<qs.length-1?u.next:u.results}</button></div>`;
+      $('#qn',el).onclick=()=>{ i++; if(i<qs.length) show(); else opts.onDone({correct,total:qs.length,points,best}); };
+    };
+    $$('.opt',el).forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+    if(opts.timed){
+      timers.push(setInterval(()=>{ const left=TT-(Date.now()-t0)/1000; const f=$('#tf',el); if(f) f.style.width=Math.max(0,left/TT*100)+'%'; if(left<=0) answer(-1); },100));
+    }
+  }
+  show();
+}
+
+function quizPane(el,id){
+  const o=O(id), u=T().ui;
+  el.innerHTML = `${guide(u.quizIntro(o.name),'happy',80)}
+    <div class="row" style="justify-content:center"><button class="btn pink" id="qs">${u.quizStart}</button></div>`;
+  $('#qs',el).onclick=()=>runQuiz(el, shuffle(T().quiz[id]), {onDone:r=>{
+    const st=S.organs[id], first=r.correct>=4 && (st.quizBest||0)<4;
+    st.quizBest=Math.max(st.quizBest||0,r.correct); save();
+    const pass=r.correct>=4; if(pass){ sfx.win(); confetti(first?90:40); } else sfx.bad();
+    const nextOrgan = ORDER.find(k=>starsOf(k)<3 && k!==id);
+    el.innerHTML = `${guide(pass?`${u.quizPass(r.correct,first)} ${starsOf(id)===3?u.quizMaster(o.name):''}`:u.quizFail(r.correct), pass?'wow':'sad',90)}
+      <div class="result-big">${'⭐'.repeat(r.correct)}${'▫️'.repeat(5-r.correct)}</div>
+      <div class="row" style="justify-content:center">
+        <button class="btn ghost" id="qa">${u.tryQ}</button>
+        ${starsOf(id)<3?`<button class="btn ghost" id="ql">${u.review}</button>`:''}
+        ${nextOrgan?`<button class="btn green" id="qnext">${u.nextOrg(META[nextOrgan].emoji+' '+O(nextOrgan).name)}</button>`:`<button class="btn pink" id="qboss">${u.toBoss}</button>`}
+        <button class="btn ghost" id="qm">${u.mapBtn}</button>
+      </div>`;
+    $('#qa',el).onclick=()=>go(screenOrgan,id,'quiz');
+    if($('#ql',el)) $('#ql',el).onclick=()=>go(screenOrgan,id,'learn');
+    if($('#qnext',el)) $('#qnext',el).onclick=()=>go(screenOrgan,nextOrgan,'learn');
+    if($('#qboss',el)) $('#qboss',el).onclick=()=>go(screenShowdown);
+    $('#qm',el).onclick=()=>go(screenMap);
+  }});
+}
+
+/* ---------- Showdown ---------- */
+function screenShowdown(){
+  const u=T().ui;
+  app.innerHTML = `<div class="card"><div class="row" style="justify-content:space-between"><button class="btn ghost small" id="back">${u.map}</button><span class="pill">🏆 ${u.best}: ${S.showdown||0} ${u.pts}</span></div>
+    <h2 style="margin-top:12px">🏆 ${u.bossT}</h2><div id="sd"></div></div>`;
+  $('#back').onclick=()=>go(screenMap);
+  const el=$('#sd');
+  el.innerHTML = `${guide(u.sdIntro,'wow',90)}
+    <div class="row" style="justify-content:center"><button class="btn pink" id="go">${u.sdGo}</button></div>`;
+  $('#go').onclick=()=>{
+    const pool = shuffle([...Object.values(T().quiz).flat(), ...T().extra]).slice(0,12);
+    runQuiz(el,pool,{timed:true,onDone:r=>{ S.showdown=Math.max(S.showdown||0,r.points); save(); go(screenCert,r); }});
+  };
+}
+function rank(p){ const R=T().ui.ranks; return p>=2000?[R[0],'🏆']:p>=1400?[R[1],'🥇']:p>=800?[R[2],'🥈']:[R[3],'🌱']; }
+let certCelebrated=null;
+function screenCert(r){
+  const u=T().ui, [title,medal]=rank(r.points);
+  const total=ORDER.reduce((a,k)=>a+starsOf(k),0);
+  const date=new Date().toLocaleDateString(u.locale,{year:'numeric',month:'long',day:'numeric'});
+  if(certCelebrated!==r){ certCelebrated=r; sfx.win(); confetti(120); }
+  app.innerHTML = `<div class="card">
+    <div class="cert">
+      <div style="display:inline-block">${dog(110,'wow')}</div>
+      <h1>${u.certT}</h1>
+      <div class="muted" style="font-weight:700">${u.certs}</div>
+      <div class="nm">${esc(S.name)}</div>
+      <p style="font-size:1.1rem">${u.certDid}</p>
+      <h2 style="font-size:1.8rem">${medal} ${title} ${medal}</h2>
+      <div class="row" style="justify-content:center;margin:10px 0">
+        <span class="pill">⭐ ${r.points} ${u.points}</span><span class="pill">✅ ${r.correct}/${r.total} ${u.correct}</span><span class="pill">🔥 ${u.bestStreak} ${r.best}</span><span class="pill">🌟 ${u.orgStars} ${total}/12</span>
+      </div>
+      <div style="font-size:2rem;letter-spacing:8px">🫁 🖐️ 🫘 🟤</div>
+      <div class="muted" style="margin-top:8px">${date} · ${u.signed}</div>
+    </div>
+    <div class="row noprint" style="justify-content:center;margin-top:16px">
+      <button class="btn" id="pr">${u.print}</button>
+      <button class="btn ghost" id="again">${u.sdAgain}</button>
+      <button class="btn ghost" id="map">${u.mapBtn}</button>
+    </div>
+    <p class="center muted noprint">${u.shot}</p>
+  </div>`;
+  $('#pr').onclick=()=>window.print();
+  $('#again').onclick=()=>go(screenShowdown);
+  $('#map').onclick=()=>go(screenMap);
+}
+
+/* ===================== Boot ===================== */
+$('#brand').onclick=()=>go(S.name?screenMap:screenTitle);
+$('#snd').onclick=()=>{ S.sound=!S.sound; save(); if(S.sound) sfx.click(); };
+$('#lang').onclick=()=>{ if(current && current[0]===screenTitle){ const n=$('#nm'); if(n) S.name=n.value.trim()||S.name; } setLang(S.lang==='en'?'id':'en'); };
+go(screenTitle);
+</script>
+</body>
+</html>
